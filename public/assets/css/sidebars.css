@@ -1,0 +1,127 @@
+.sidebar-wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  .sidebar-wrapper.collapsed {
+    width: 80px;
+  }
+  
+  .sidebar-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .logo-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 20px 15px;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f1f1;
+  }
+  
+  .sidebar-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  
+  .sidebar-scroll {
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+  
+  .sidebar-links {
+    padding: 20px 0;
+    list-style: none;
+  }
+  
+  .sidebar-list {
+    position: relative;
+    margin-bottom: 5px;
+  }
+  
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  
+  .sidebar-link:hover {
+    background: #f8f9fa;
+  }
+  
+  .sidebar-icon {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .sidebar-label {
+    flex: 1;
+  }
+  
+  .sidebar-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 20px;
+    list-style: none;
+  }
+  
+  .sidebar-submenu.open {
+    max-height: 500px;
+  }
+  
+  .sidebar-submenu li a {
+    display: block;
+    padding: 8px 15px;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  
+  .sidebar-submenu li a:hover {
+    color: #000;
+    background: #f1f1f1;
+  }
+  
+  .submenu-arrow {
+    margin-left: auto;
+  }
+  
+  .back-btn {
+    display: none; /* Hide on desktop */
+  }
+  
+  @media (max-width: 992px) {
+    .sidebar-wrapper {
+      transform: translateX(-100%);
+      width: 280px;
+    }
+    
+    .sidebar-wrapper.show {
+      transform: translateX(0);
+    }
+    
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      border-bottom: 1px solid #f1f1f1;
+    }
+  }
