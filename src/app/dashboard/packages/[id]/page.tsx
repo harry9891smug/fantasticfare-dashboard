@@ -151,24 +151,14 @@ export default function PackageDetailsClient() {
   if (!packageData) {
     return <div className="container py-5 text-center">Loading package details...</div>;
   }
+  const inclusions = (packageData.inclusion as any[])
+  ?.filter(item => item.type === 'inclusion')
+  .flatMap(item => item.description) || [];
 
-  // Separate inclusions and exclusions with proper typing
-  const inclusions = packageData.inclusion
-  ?.flatMap((group: InclusionGroup) =>
-    Array.isArray(group.types)
-      ? group.types
-          .filter((item: InclusionItem) => item.type === 'inclusion')
-          .flatMap(item => item.description)
-      : []
-  ) || [];
-  const exclusions = packageData.inclusion
-  ?.flatMap((group: InclusionGroup) =>
-    Array.isArray(group.types)
-      ? group.types
-          .filter((item: InclusionItem) => item.type === 'exclusion')
-          .flatMap(item => item.description)
-      : []
-  ) || [];
+const exclusions = (packageData.inclusion as any[])
+  ?.filter((item: any) => item.type === 'exclusion')
+  .flatMap(item => Array.isArray(item.description) ? item.description : []) || [];
+
   const package_images = Array.isArray(packageData.package_image)
   ? packageData.package_image  
   : (packageData.package_image || "").split(","); 
@@ -278,7 +268,7 @@ export default function PackageDetailsClient() {
                             <div className="row g-2">
                               <div className="col-md-6">
                                 <div className="about-sec">
-                                  <h4>Inclusion</h4>
+                                  <h4>Inclusion</h4> 
                                   <ul>
                                     {inclusions.map((item, index) => (
                                       <li key={index}>{item}</li>
