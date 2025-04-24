@@ -121,7 +121,7 @@ export default function PackageDetailsClient() {
 
   useEffect(() => {
     if (id) {
-      fetch(`https://backend.fantasticfare.com/api/package_view/${id}`)
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`)
         .then(res => res.json())
         .then(data => {
           if (data.status) {
@@ -137,12 +137,14 @@ export default function PackageDetailsClient() {
   }
 
   // Separate inclusions and exclusions with proper typing
-  const inclusions = packageData.inclusion.flatMap((item: InclusionGroup) => 
-    item.types.filter((type: InclusionItem) => type.type === 'inclusion')
-  );
-  const exclusions = packageData.inclusion.flatMap((item: InclusionGroup) => 
-    item.types.filter((type: InclusionItem) => type.type === 'exclusion')
-  );
+  const inclusions = packageData.inclusion
+  ?.filter((item: InclusionItem) => item.type === 'inclusion')
+  .flatMap(item => item.description);
+  
+const exclusions = packageData.inclusion
+  .filter((item: InclusionItem) => item.type === 'exclusion')
+  .flatMap(item => item.description);
+
   return (
     <>
       <Head>
@@ -160,12 +162,12 @@ export default function PackageDetailsClient() {
                   <p className="mb-0">{packageData.package_heading}</p>
                 </div>
                 <form className="d-inline-flex">
-                  <Link href={`/packages/edit/${packageData._id}`} className="btn align-items-center btn-theme me-3">
+                  <Link href={`/dashboard/packages/edit/${packageData._id}`} className="btn align-items-center btn-theme me-3">
                     <i className="fa fa-pencil-square-o me-2"></i>Edit
                   </Link>
-                  <button className="btn align-items-center d-flex btn-outline">
+                  {/* <button className="btn align-items-center d-flex btn-outline">
                     <i className="fa fa-trash-o me-2"></i>Delete
-                  </button>
+                  </button> */}
                 </form>
               </div>
 
@@ -175,14 +177,16 @@ export default function PackageDetailsClient() {
                     <div className="col-12">
                       <div className="description-section tab-section">
                         <div className="detail-img">
+                          {packageData.package_image.map((item, index) => (
                           <Image  
-                            src={`http://localhost:8000/uploads/packages/${packageData.package_image}`}
-                            className="img-fluid blur-up lazyload" 
+                            src={`${item}`}
+                            className="img-fluid blur-up lazyload ms-2" 
                             alt={packageData.package_name}
-                            style={{ width: '100%', height: 'auto' }}
-                            height={300}
-                            width={500}
+                            // style={{ width: '100%', height: 'auto' }}
+                            height={50}
+                            width={200}
                           />
+                        ))}
                         </div>
                         <div className="menu-top menu-up">
                           <ul className="nav nav-tabs" id="top-tab" role="tablist">
@@ -249,7 +253,7 @@ export default function PackageDetailsClient() {
                                   <h4>Inclusion</h4>
                                   <ul>
                                     {inclusions.map((item, index) => (
-                                      <li key={index}>{item.description}</li>
+                                      <li key={index}>{item}</li>
                                     ))}
                                   </ul>
                                 </div>
@@ -259,7 +263,7 @@ export default function PackageDetailsClient() {
                                   <h4>Exclusion</h4>
                                   <ul>
                                     {exclusions.map((item, index) => (
-                                      <li key={index}>{item.description}</li>
+                                      <li key={index}>{item}</li>
                                     ))}
                                   </ul>
                                 </div>
@@ -269,8 +273,9 @@ export default function PackageDetailsClient() {
                             <div className="about-sec">
                               <h6>Package Details</h6>
                               <p>
-                                <strong>From Country:</strong> {packageData.from_country}<br />
-                                <strong>To Country:</strong> {packageData.to_country}<br />
+                                <strong>Continent:</strong> {packageData?.continent_name?.name}<br />
+                                <strong>Region:</strong> {packageData?.region_name?.name}<br />
+                                <strong>Country:</strong> {packageData?.country_name?.name}<br />
                                 <strong>Total Price:</strong> ${packageData.total_price}<br />
                                 {packageData.discounted_price && (
                                   <>
@@ -314,7 +319,7 @@ export default function PackageDetailsClient() {
                                               <div className="row mt-3">
                                                 {day.day_images.map((img, k) => (
                                                   <div className="col-md-3 mb-3" key={k}>
-                                                    <Image  width={500}
+                                                    <Image  width={500}  height={300}
                                                       src={img} 
                                                       className="img-fluid" 
                                                       alt={`Day ${j+1} Image ${k+1}`}
@@ -326,14 +331,14 @@ export default function PackageDetailsClient() {
                                             <div className="highlight">
                                               <ul>
                                                 <li>
-                                                  <Image  width={500}
+                                                  <Image  width={500}  height={300}
                                                     src="/assets/images/icon/tour/fork.png" 
                                                     className="img-fluid blur-up lazyload" 
                                                     alt="" 
                                                   /> Dinner
                                                 </li>
                                                 <li>
-                                                  <Image  width={500}
+                                                  <Image  width={500} height={300}
                                                     src="/assets/images/icon/tour/bed.png" 
                                                     className="img-fluid blur-up lazyload" 
                                                     alt="" 
@@ -386,7 +391,7 @@ export default function PackageDetailsClient() {
                                               <div className="row mt-3">
                                                 {day.activity_images.map((img, k) => (
                                                   <div className="col-md-3 mb-3" key={k}>
-                                                    <Image  width={500}
+                                                    <Image  width={500}  height={300}
                                                       src={img} 
                                                       className="img-fluid" 
                                                       alt={`Activity ${j+1} Image ${k+1}`}
@@ -417,7 +422,7 @@ export default function PackageDetailsClient() {
                                       <div className="list-box mb-4" key={j}>
                                         {day.hotel_images && day.hotel_images.length > 0 && (
                                           <div className="list-img">
-                                            <Image  width={500}
+                                            <Image  width={500}  height={300}
                                               src={day.hotel_images[0]} 
                                               className="img-fluid blur-up lazyload"
                                               alt={day.hotel_name}
@@ -431,7 +436,7 @@ export default function PackageDetailsClient() {
                                             <p>{day.hotel_description}</p>
                                             <div className="facility-icon">
                                               <div className="facility-box">
-                                                <Image  width={500}
+                                                <Image  width={500} height={300}
                                                   src="/assets/images/icon/hotel/wifi.png" 
                                                   className="img-fluid blur-up lazyload" 
                                                   alt=""
@@ -439,7 +444,7 @@ export default function PackageDetailsClient() {
                                                 <span>WiFi</span>
                                               </div>
                                               <div className="facility-box">
-                                                <Image  width={500}
+                                                <Image  width={500}  height={300}
                                                   src="/assets/images/icon/hotel/pool.png" 
                                                   className="img-fluid blur-up lazyload" 
                                                   alt=""
@@ -451,7 +456,7 @@ export default function PackageDetailsClient() {
                                               <div className="row mt-3">
                                                 {day.hotel_images.slice(1).map((img, k) => (
                                                   <div className="col-md-3 mb-3" key={k}>
-                                                    <Image  width={500}
+                                                    <Image  width={500}  height={300}
                                                       src={img} 
                                                       className="img-fluid" 
                                                       alt={`${day.hotel_name} Image ${k+2}`}

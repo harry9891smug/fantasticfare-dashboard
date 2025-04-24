@@ -114,14 +114,14 @@ export default function Sidebar() {
         
         <div className="logo-icon-wrapper">
           <Link href="/dashboard">
-            <Image 
+            {/* <Image 
               src="/assets/images/logo/logo-icon.png" 
               width={40} 
               height={40} 
               alt="Logo"
               className="img-fluid"
               priority
-            />
+            /> */}
           </Link>
         </div>
 
@@ -134,13 +134,13 @@ export default function Sidebar() {
             <ul className="sidebar-links">
               <li className="back-btn">
                 <Link href="/dashboard">
-                  <Image 
+                  {/* <Image 
                     src="/assets/images/logo/logo-icon.png" 
                     width={30} 
                     height={30} 
                     alt="Logo"
                     className="img-fluid"
-                  />
+                  /> */}
                 </Link>
                 {!isCollapsed && (
                   <div className="mobile-back text-end">

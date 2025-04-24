@@ -55,13 +55,13 @@ export default function NewInclusionExclusion() {
     })
 
     try {
-      await axios.post('https://backend.fantasticfare.com/api/inclusion-create', formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/inclusion-create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       })
-      alert("Hotel stays added successfully!")
+      alert("Inclusions/Exculsions added successfully!")
       router.push(`/dashboard/faq/${id}`);
     } catch (err: any) {
       alert(err?.response?.data?.message || 'Failed to save Inclusions/exclusions')

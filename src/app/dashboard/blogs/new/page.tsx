@@ -88,7 +88,8 @@ export default function AddArticle() {
 
       // Append all images
       articleData.article_images.forEach((image, index) => {
-        formData.append(`article_images[${index}]`, image)
+        // ${index}
+        formData.append(`article_images[]`, image)
       })
 
       articleData.questions.forEach(q => {
@@ -96,7 +97,7 @@ export default function AddArticle() {
         formData.append('answers[]', q.answer)
       })
 
-      await axios.post('https://backend.fantasticfare.com/api/article-store', formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/article-store`, formData, {
         headers: {
           Authorization: `${token}`,
           'Content-Type': 'multipart/form-data'
@@ -268,7 +269,7 @@ export default function AddArticle() {
                   <button 
                     type="button" 
                     className="btn btn-outline-primary" 
-                    onClick={() => router.push('/dashboard/articles')}
+                    onClick={() => router.push('/dashboard/blogs')}
                   >
                     Cancel
                   </button>

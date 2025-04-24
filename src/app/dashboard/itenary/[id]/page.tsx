@@ -70,7 +70,7 @@ export default function NewItinerary() {
     })
 
     try {
-      await axios.post('https://backend.fantasticfare.com/api/itenary-create', formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/itenary-create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

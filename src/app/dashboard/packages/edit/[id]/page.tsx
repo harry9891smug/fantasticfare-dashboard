@@ -18,7 +18,7 @@ const PackageEditOptions = () => {
   useEffect(() => {
     const fetchPackage = async () => {
       try {
-        const response = await axios.get(`https://backend.fantasticfare.com/api/package_view/${id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`);
         setPackageData(response.data.data);
       } catch (error) {
         console.error('Error fetching package:', error);

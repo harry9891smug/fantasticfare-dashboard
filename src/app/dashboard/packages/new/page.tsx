@@ -36,7 +36,7 @@ export default function NewPackage() {
     package_name: '',
     package_url: '',
     package_heading: '',
-    package_images: [], // Initialize as empty array
+    package_images: [], 
     total_price: '',
     discounted_price: '',
     meta_name: '',
@@ -64,7 +64,7 @@ export default function NewPackage() {
 
     const fetchAddons = async () => {
       try {
-        const res = await axios.get<{ data: Addon[] }>('https://backend.fantasticfare.com/api/package-addons', {
+        const res = await axios.get<{ data: Addon[] }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package-addons`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         setAvailableAddons(res.data.data)
@@ -77,7 +77,7 @@ export default function NewPackage() {
 
     const fetchContinents = async () => {
       try {
-        const res = await axios.get<{ data: Continent[] }>('https://backend.fantasticfare.com/api/continents',{
+        const res = await axios.get<{ data: Continent[] }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/continents`,{
           headers: { Authorization: `Bearer ${token}` }
         })
         setContinents(res.data.data)
@@ -94,7 +94,7 @@ export default function NewPackage() {
     const token = localStorage.getItem('authToken')
     if (formData.continent) {
       axios
-        .get<{ data: Region[] }>(`https://backend.fantasticfare.com/api/regions/${formData.continent}`,{
+        .get<{ data: Region[] }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/regions/${formData.continent}`,{
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => {
@@ -110,7 +110,7 @@ export default function NewPackage() {
     const token = localStorage.getItem('authToken')
     if (formData.region) {
       axios
-        .get<{ data: Country[] }>(`https://backend.fantasticfare.com/api/countries/${formData.region}`,{
+        .get<{ data: Country[] }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/countries/${formData.region}`,{
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => {
@@ -123,7 +123,8 @@ export default function NewPackage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+      setFormData(prev => ({ ...prev, [name]: value }))
+    console.log(formData)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -193,7 +194,8 @@ export default function NewPackage() {
 
     // Append all images
     formData.package_images.forEach((image, index) => {
-      formDataObj.append(`package_images[${index}]`, image)
+      // ${index}
+      formDataObj.append(`package_images[]`, image)
     })
 
     // Append addon IDs
@@ -203,7 +205,7 @@ export default function NewPackage() {
 
     try {
       const response = await axios.post<{ package_id: string }>(
-        'https://backend.fantasticfare.com/api/package-create',
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/package-create`,
         formDataObj,
         {
           headers: {
@@ -241,7 +243,7 @@ export default function NewPackage() {
                 >
                   <option value="">Select Continent</option>
                   {continents.map(c => (
-                    <option key={c.id} value={c.id}>
+                    <option key={c.id} value={c.id} >
                       {c.name}
                     </option>
                   ))}
@@ -259,7 +261,7 @@ export default function NewPackage() {
                 >
                   <option value="">Select Region</option>
                   {regions.map(r => (
-                    <option key={r.id} value={r.id}>
+                    <option key={r.id} value={r.id} >
                       {r.name}
                     </option>
                   ))}
@@ -277,7 +279,7 @@ export default function NewPackage() {
                 >
                   <option value="">Select Country</option>
                   {countries.map(c => (
-                    <option key={c.id} value={c.id}>
+                    <option key={c.id} value={c.id} >
                       {c.name}
                     </option>
                   ))}
@@ -361,7 +363,7 @@ export default function NewPackage() {
                               onChange={() => handleAddonToggle(addon._id)}
                             />
                             <label className="form-check-label" htmlFor={`addon-${addon._id}`}>
-                              <IconRenderer iconClass={addon.addon_icon} /> {addon.name}
+                              <IconRenderer iconClass={addon.addon_icon} /> {addon.addon_name}
                             </label>
                           </div>
                         </div>

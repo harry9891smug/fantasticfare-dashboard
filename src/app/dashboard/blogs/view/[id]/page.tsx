@@ -31,7 +31,7 @@ export default function AddOrEditArticle() {
       
       const token = localStorage.getItem('authToken')
       try {
-        const res = await axios.get(`https://backend.fantasticfare.com/api/view-article/${articleId}`, {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/view-article/${articleId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
 
@@ -120,7 +120,8 @@ export default function AddOrEditArticle() {
 
     // Append new images
     newImages.forEach((img, index) => {
-      formData.append(`article_images[${index}]`, img)
+      // ${index}
+      formData.append(`article_images[]`, img)
     })
 
     articleData.faqs.forEach(q => {
@@ -130,7 +131,7 @@ export default function AddOrEditArticle() {
 
     try {
       if (articleId) {
-        await axios.put(`https://backend.fantasticfare.com/api/article-update/${articleId}`, formData, {
+        await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/article-update/${articleId}`, formData, {
           headers: {
             Authorization: `${token}`,
             'Content-Type': 'multipart/form-data'
@@ -138,7 +139,7 @@ export default function AddOrEditArticle() {
         })
         alert('Article updated successfully!')
       } else {
-        await axios.post('https://backend.fantasticfare.com/api/article-store', formData, {
+        await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/article-store`, formData, {
           headers: {
             Authorization: `${token}`,
             'Content-Type': 'multipart/form-data'
@@ -192,7 +193,7 @@ export default function AddOrEditArticle() {
                   <small className="text-muted">You can select multiple images</small>
                   
                   {/* Existing Images */}
-                  {/* <div className="d-flex flex-wrap gap-3 mt-3">
+                  <div className="d-flex flex-wrap gap-3 mt-3">
                     {articleData.article_images.map((img, index) => (
                       <div key={`existing-${index}`} className="position-relative" style={{ width: '150px', height: '150px' }}>
                         <Image
@@ -211,7 +212,7 @@ export default function AddOrEditArticle() {
                         </button>
                       </div>
                     ))}
-                  </div> */}
+                  </div>
 
                   {/* New Images */}
                   <div className="d-flex flex-wrap gap-3 mt-3">

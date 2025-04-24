@@ -21,7 +21,7 @@ export default function AllPackages() {
     const fetchPackages = async () => {
       const token = localStorage.getItem('authToken')
       try {
-        const res = await axios.get('https://backend.fantasticfare.com/api/package-list', {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package-list`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         setPackages(res.data.data)
@@ -36,10 +36,11 @@ export default function AllPackages() {
     if (!confirm('Delete this package?')) return
     const token = localStorage.getItem('authToken')
     try {
-      await axios.delete(`https://backend.fantasticfare.com/api/delete-package/${id}`, {
+      const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/delete-package/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setPackages(packages.filter(pkg => pkg._id !== id))
+      alert(response.data.message)
     } catch (err:any) {
       alert(err.response?.data?.message || 'Delete failed')
     }

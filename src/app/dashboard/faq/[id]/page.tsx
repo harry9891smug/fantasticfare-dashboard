@@ -37,7 +37,7 @@ export default function NewFaqCreate() {
     })
 
     try {
-      await axios.post('https://backend.fantasticfare.com/api/package-faq-create', formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package-faq-create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

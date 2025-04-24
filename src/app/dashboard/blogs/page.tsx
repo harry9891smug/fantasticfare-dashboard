@@ -26,7 +26,7 @@ export default function AllArticles() {
       }
 
       try {
-        const response = await axios.get('https://backend.fantasticfare.com/api/articles', {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/articles`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -49,7 +49,7 @@ export default function AllArticles() {
     const token = localStorage.getItem('authToken')
 
     try {
-      await axios.delete(`https://backend.fantasticfare.com/api/delete-article/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/delete-article/${id}`, {
         headers: { Authorization: `${token}` },
       })
       alert('Article deleted successfully!')
