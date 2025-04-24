@@ -87,7 +87,20 @@ type FAQGroup = {
   updatedAt: string;
   __v: number;
 };
+type COUNTRY = {
+  _id: string;
+  name: string;
+};
 
+type REGION = {
+  _id: string;
+  name: string;
+};
+
+type CONTINENT = {
+  _id: string;
+  name: string;
+};
 type PackageData = {
   _id: string;
   package_name: string;
@@ -111,6 +124,9 @@ type PackageData = {
   stays: Stay[];
   inclusion: InclusionGroup[];
   faq: FAQGroup[];
+  continent_name: CONTINENT;
+  region_name: REGION;
+  country_name: COUNTRY;
 };
 
 export default function PackageDetailsClient() {
@@ -138,12 +154,24 @@ export default function PackageDetailsClient() {
 
   // Separate inclusions and exclusions with proper typing
   const inclusions = packageData.inclusion
-  ?.filter((item: InclusionItem) => item.type === 'inclusion')
-  .flatMap(item => item.description);
-  
-const exclusions = packageData.inclusion
-  .filter((item: InclusionItem) => item.type === 'exclusion')
-  .flatMap(item => item.description);
+  ?.flatMap((group: InclusionGroup) =>
+    Array.isArray(group.types)
+      ? group.types
+          .filter((item: InclusionItem) => item.type === 'inclusion')
+          .flatMap(item => item.description)
+      : []
+  ) || [];
+  const exclusions = packageData.inclusion
+  ?.flatMap((group: InclusionGroup) =>
+    Array.isArray(group.types)
+      ? group.types
+          .filter((item: InclusionItem) => item.type === 'exclusion')
+          .flatMap(item => item.description)
+      : []
+  ) || [];
+  const package_images = Array.isArray(packageData.package_image)
+  ? packageData.package_image  
+  : (packageData.package_image || "").split(","); 
 
   return (
     <>
@@ -177,21 +205,21 @@ const exclusions = packageData.inclusion
                     <div className="col-12">
                       <div className="description-section tab-section">
                         <div className="detail-img">
-                          {packageData.package_image.map((item, index) => (
-                          <Image  
-                            src={`${item}`}
-                            className="img-fluid blur-up lazyload ms-2" 
-                            alt={packageData.package_name}
-                            // style={{ width: '100%', height: 'auto' }}
-                            height={50}
-                            width={200}
-                          />
-                        ))}
+                          {package_images?.map((item, index) => (
+                            <Image
+                              key={index} // ✅ Fix added here
+                              src={item}
+                              className="img-fluid blur-up lazyload ms-2"
+                              alt={packageData.package_name}
+                              height={50}
+                              width={200}
+                            />
+                          ))}
                         </div>
                         <div className="menu-top menu-up">
                           <ul className="nav nav-tabs" id="top-tab" role="tablist">
                             <li className="nav-item">
-                              <button 
+                              <button
                                 className={`nav-link ${activeTab === 'highlight' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('highlight')}
                               >
@@ -199,7 +227,7 @@ const exclusions = packageData.inclusion
                               </button>
                             </li>
                             <li className="nav-item">
-                              <button 
+                              <button
                                 className={`nav-link ${activeTab === 'itinerary' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('itinerary')}
                               >
@@ -207,7 +235,7 @@ const exclusions = packageData.inclusion
                               </button>
                             </li>
                             <li className="nav-item">
-                              <button 
+                              <button
                                 className={`nav-link ${activeTab === 'activities' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('activities')}
                               >
@@ -215,7 +243,7 @@ const exclusions = packageData.inclusion
                               </button>
                             </li>
                             <li className="nav-item">
-                              <button 
+                              <button
                                 className={`nav-link ${activeTab === 'accommodations' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('accommodations')}
                               >
@@ -223,7 +251,7 @@ const exclusions = packageData.inclusion
                               </button>
                             </li>
                             <li className="nav-item">
-                              <button 
+                              <button
                                 className={`nav-link ${activeTab === 'faq' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('faq')}
                               >
@@ -231,7 +259,7 @@ const exclusions = packageData.inclusion
                               </button>
                             </li>
                             <li className="nav-item">
-                              <button 
+                              <button
                                 className={`nav-link ${activeTab === 'policy' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('policy')}
                               >
@@ -240,7 +268,7 @@ const exclusions = packageData.inclusion
                             </li>
                           </ul>
                         </div>
-                        
+
                         <div className="description-details tab-content" id="top-tabContent">
                           {/* Highlight Tab */}
                           <div className={`menu-part about tab-pane fade ${activeTab === 'highlight' ? 'show active' : ''}`} id="highlight">
@@ -269,7 +297,7 @@ const exclusions = packageData.inclusion
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div className="about-sec">
                               <h6>Package Details</h6>
                               <p>
@@ -296,9 +324,9 @@ const exclusions = packageData.inclusion
                                       <div className="card" key={j}>
                                         <div className="card-header dark-body" id={`headingItinerary${i}${j}`}>
                                           <h5 className="mb-0">
-                                            <button 
-                                              className="btn btn-link" 
-                                              data-bs-toggle="collapse" 
+                                            <button
+                                              className="btn btn-link"
+                                              data-bs-toggle="collapse"
                                               data-bs-target={`#collapseItinerary${i}${j}`}
                                               aria-expanded={i === 0 && j === 0 ? "true" : "false"}
                                               aria-controls={`collapseItinerary${i}${j}`}
@@ -307,8 +335,8 @@ const exclusions = packageData.inclusion
                                             </button>
                                           </h5>
                                         </div>
-                                        <div 
-                                          id={`collapseItinerary${i}${j}`} 
+                                        <div
+                                          id={`collapseItinerary${i}${j}`}
                                           className={`collapse ${i === 0 && j === 0 ? 'show' : ''}`}
                                           aria-labelledby={`headingItinerary${i}${j}`}
                                           data-bs-parent="#accordion"
@@ -319,10 +347,10 @@ const exclusions = packageData.inclusion
                                               <div className="row mt-3">
                                                 {day.day_images.map((img, k) => (
                                                   <div className="col-md-3 mb-3" key={k}>
-                                                    <Image  width={500}  height={300}
-                                                      src={img} 
-                                                      className="img-fluid" 
-                                                      alt={`Day ${j+1} Image ${k+1}`}
+                                                    <Image width={500} height={300}
+                                                      src={img}
+                                                      className="img-fluid"
+                                                      alt={`Day ${j + 1} Image ${k + 1}`}
                                                     />
                                                   </div>
                                                 ))}
@@ -331,17 +359,17 @@ const exclusions = packageData.inclusion
                                             <div className="highlight">
                                               <ul>
                                                 <li>
-                                                  <Image  width={500}  height={300}
-                                                    src="/assets/images/icon/tour/fork.png" 
-                                                    className="img-fluid blur-up lazyload" 
-                                                    alt="" 
+                                                  <Image width={500} height={300}
+                                                    src="/assets/images/icon/tour/fork.png"
+                                                    className="img-fluid blur-up lazyload"
+                                                    alt=""
                                                   /> Dinner
                                                 </li>
                                                 <li>
-                                                  <Image  width={500} height={300}
-                                                    src="/assets/images/icon/tour/bed.png" 
-                                                    className="img-fluid blur-up lazyload" 
-                                                    alt="" 
+                                                  <Image width={500} height={300}
+                                                    src="/assets/images/icon/tour/bed.png"
+                                                    className="img-fluid blur-up lazyload"
+                                                    alt=""
                                                   /> Night stay
                                                 </li>
                                               </ul>
@@ -368,9 +396,9 @@ const exclusions = packageData.inclusion
                                       <div className="card" key={j}>
                                         <div className="card-header dark-body" id={`headingActivity${i}${j}`}>
                                           <h5 className="mb-0">
-                                            <button 
-                                              className="btn btn-link" 
-                                              data-bs-toggle="collapse" 
+                                            <button
+                                              className="btn btn-link"
+                                              data-bs-toggle="collapse"
                                               data-bs-target={`#collapseActivity${i}${j}`}
                                               aria-expanded={i === 0 && j === 0 ? "true" : "false"}
                                               aria-controls={`collapseActivity${i}${j}`}
@@ -379,8 +407,8 @@ const exclusions = packageData.inclusion
                                             </button>
                                           </h5>
                                         </div>
-                                        <div 
-                                          id={`collapseActivity${i}${j}`} 
+                                        <div
+                                          id={`collapseActivity${i}${j}`}
                                           className={`collapse ${i === 0 && j === 0 ? 'show' : ''}`}
                                           aria-labelledby={`headingActivity${i}${j}`}
                                           data-bs-parent="#accordionActivities"
@@ -391,10 +419,10 @@ const exclusions = packageData.inclusion
                                               <div className="row mt-3">
                                                 {day.activity_images.map((img, k) => (
                                                   <div className="col-md-3 mb-3" key={k}>
-                                                    <Image  width={500}  height={300}
-                                                      src={img} 
-                                                      className="img-fluid" 
-                                                      alt={`Activity ${j+1} Image ${k+1}`}
+                                                    <Image width={500} height={300}
+                                                      src={img}
+                                                      className="img-fluid"
+                                                      alt={`Activity ${j + 1} Image ${k + 1}`}
                                                     />
                                                   </div>
                                                 ))}
@@ -422,8 +450,8 @@ const exclusions = packageData.inclusion
                                       <div className="list-box mb-4" key={j}>
                                         {day.hotel_images && day.hotel_images.length > 0 && (
                                           <div className="list-img">
-                                            <Image  width={500}  height={300}
-                                              src={day.hotel_images[0]} 
+                                            <Image width={500} height={300}
+                                              src={day.hotel_images[0]}
                                               className="img-fluid blur-up lazyload"
                                               alt={day.hotel_name}
                                               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
@@ -436,17 +464,17 @@ const exclusions = packageData.inclusion
                                             <p>{day.hotel_description}</p>
                                             <div className="facility-icon">
                                               <div className="facility-box">
-                                                <Image  width={500} height={300}
-                                                  src="/assets/images/icon/hotel/wifi.png" 
-                                                  className="img-fluid blur-up lazyload" 
+                                                <Image width={500} height={300}
+                                                  src="/assets/images/icon/hotel/wifi.png"
+                                                  className="img-fluid blur-up lazyload"
                                                   alt=""
                                                 />
                                                 <span>WiFi</span>
                                               </div>
                                               <div className="facility-box">
-                                                <Image  width={500}  height={300}
-                                                  src="/assets/images/icon/hotel/pool.png" 
-                                                  className="img-fluid blur-up lazyload" 
+                                                <Image width={500} height={300}
+                                                  src="/assets/images/icon/hotel/pool.png"
+                                                  className="img-fluid blur-up lazyload"
                                                   alt=""
                                                 />
                                                 <span>Pool</span>
@@ -456,10 +484,10 @@ const exclusions = packageData.inclusion
                                               <div className="row mt-3">
                                                 {day.hotel_images.slice(1).map((img, k) => (
                                                   <div className="col-md-3 mb-3" key={k}>
-                                                    <Image  width={500}  height={300}
-                                                      src={img} 
-                                                      className="img-fluid" 
-                                                      alt={`${day.hotel_name} Image ${k+2}`}
+                                                    <Image width={500} height={300}
+                                                      src={img}
+                                                      className="img-fluid"
+                                                      alt={`${day.hotel_name} Image ${k + 2}`}
                                                     />
                                                   </div>
                                                 ))}
@@ -487,9 +515,9 @@ const exclusions = packageData.inclusion
                                       <div className="card" key={j}>
                                         <div className="card-header dark-body" id={`headingFaq${i}${j}`}>
                                           <h5 className="mb-0">
-                                            <button 
-                                              className="btn btn-link" 
-                                              data-bs-toggle="collapse" 
+                                            <button
+                                              className="btn btn-link"
+                                              data-bs-toggle="collapse"
                                               data-bs-target={`#collapseFaq${i}${j}`}
                                               aria-expanded={i === 0 && j === 0 ? "true" : "false"}
                                               aria-controls={`collapseFaq${i}${j}`}
@@ -498,8 +526,8 @@ const exclusions = packageData.inclusion
                                             </button>
                                           </h5>
                                         </div>
-                                        <div 
-                                          id={`collapseFaq${i}${j}`} 
+                                        <div
+                                          id={`collapseFaq${i}${j}`}
                                           className={`collapse ${i === 0 && j === 0 ? 'show' : ''}`}
                                           aria-labelledby={`headingFaq${i}${j}`}
                                           data-bs-parent="#accordionFaq"
@@ -520,34 +548,34 @@ const exclusions = packageData.inclusion
 
                           {/* Policy Tab */}
                           <div className={`about menu-part tab-pane fade ${activeTab === 'policy' ? 'show active' : ''}`} id="policy">
-                                <div className="about-sec">
-                                    <h6 className="resturant-6">Payment Policy</h6>
-                                    <ul className="policiy-6">
-                                    <li>Initial deposit &ndash; INR. 1,00,000 per person at the time of booking.</li>
-                                    <li>1st part payment 50% of the tour cost at least 60 days prior departure.</li>
-                                    <li>Balance payment 30 days prior departure.</li>
-                                    </ul>
-                                </div>
-                                <div className="about-sec">
-                                    <h6 className="resturant-6">Cancellation Policy</h6>
-                                    <ul className="policiy-6">
-                                    <li>Deposit of INR 1,00,000 per person is non-refundable in any case once booking is confirmed.</li>
-                                    <li>45 Days to 60 days prior to departure &ndash; 50% of the total tour cost.</li>
-                                    <li>30 to 44 Days prior to departure 75% of the tour cost.</li>
-                                    <li>Within 30 days of departure 100% of the tour cost.</li>
-                                    </ul>
-                                </div>
-                                <div className="about-sec">
-                                    <h6 className="resturant-6">Important Terms and Conditions</h6>
-                                    <ul className="policiy-6">
-                                    <li>All travelers have to carry their own passports, tickets, forex &amp; any other important documents.</li>
-                                    <li>Passengers having excess baggage over 20 kgs per person in check in baggage &amp; 07 kgs in hand luggage are liable to pay excess baggage charge directly at airport.</li>
-                                    <li>Any sightseeing not mentioned in the itinerary will have to be paid directly.</li>
-                                    <li>For the convenience of passengers the itinerary may be amended.</li>
-                                    <li>Flight cost and availability are subject to change at time of actual booking.</li>
-                                    </ul>
-                                </div>
-                                </div>
+                            <div className="about-sec">
+                              <h6 className="resturant-6">Payment Policy</h6>
+                              <ul className="policiy-6">
+                                <li>Initial deposit &ndash; INR. 1,00,000 per person at the time of booking.</li>
+                                <li>1st part payment 50% of the tour cost at least 60 days prior departure.</li>
+                                <li>Balance payment 30 days prior departure.</li>
+                              </ul>
+                            </div>
+                            <div className="about-sec">
+                              <h6 className="resturant-6">Cancellation Policy</h6>
+                              <ul className="policiy-6">
+                                <li>Deposit of INR 1,00,000 per person is non-refundable in any case once booking is confirmed.</li>
+                                <li>45 Days to 60 days prior to departure &ndash; 50% of the total tour cost.</li>
+                                <li>30 to 44 Days prior to departure 75% of the tour cost.</li>
+                                <li>Within 30 days of departure 100% of the tour cost.</li>
+                              </ul>
+                            </div>
+                            <div className="about-sec">
+                              <h6 className="resturant-6">Important Terms and Conditions</h6>
+                              <ul className="policiy-6">
+                                <li>All travelers have to carry their own passports, tickets, forex &amp; any other important documents.</li>
+                                <li>Passengers having excess baggage over 20 kgs per person in check in baggage &amp; 07 kgs in hand luggage are liable to pay excess baggage charge directly at airport.</li>
+                                <li>Any sightseeing not mentioned in the itinerary will have to be paid directly.</li>
+                                <li>For the convenience of passengers the itinerary may be amended.</li>
+                                <li>Flight cost and availability are subject to change at time of actual booking.</li>
+                              </ul>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

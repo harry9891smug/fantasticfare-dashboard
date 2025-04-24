@@ -6,7 +6,7 @@ import Image from 'next/image'
 
 type Addon = {
   _id: string
-  name: string
+  addon_name: string
   addon_icon: string
 }
 
