@@ -15,8 +15,8 @@ const nunitoSans = Nunito_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Rica - Dashboard',
-  description: 'Rica admin dashboard template',
+  title: 'FantasticFare Dashboard',
+  description: 'FantasticFare Dashboard',
 }
 
 export default async function RootLayout({

@@ -60,10 +60,6 @@ export default function Sidebar() {
         { label: 'Add New Package', href: '/dashboard/packages/new' },
         { label: 'Addons', href: '/dashboard/addons' },
         { label: 'Packages', href: '/dashboard/packages' },
-        // { label: 'Itenary', href: '/dashboard/itenary' },
-        // { label: 'Stays', href: '/dashboard/stays' },
-        // { label: 'Activities', href: '/dashboard/activities' },
-        // { label: 'Inclusions', href: '/dashboard/inclusions' },
       ]
     },
     { 
@@ -81,7 +77,6 @@ export default function Sidebar() {
       label: 'Tips&Articles',
       href: '#',
       subItems: [
-
         { label: 'Add Articles', href: '/dashboard/blogs/new' },
         { label: 'All Articles', href: '/dashboard/blogs' },
       ]

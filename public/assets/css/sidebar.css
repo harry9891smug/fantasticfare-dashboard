@@ -1,0 +1,162 @@
+/* General sidebar styles */
+.sidebar-wrapper {
+    width: 250px;
+    background-color: #2c3e50;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transition: width 0.3s ease;
+    z-index: 100;
+  }
+  
+  .sidebar-wrapper.collapsed {
+    width: 70px;
+  }
+  
+  .sidebar-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .logo-wrapper {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #34495e;
+  }
+  
+  .back-btn {
+    cursor: pointer;
+  }
+  
+  .toggle-sidebar {
+    display: none;
+  }
+  
+  /* Sidebar Logo Section */
+  .logo-icon-wrapper {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .sidebar-main {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .sidebar-scroll {
+    max-height: 100%;
+  }
+  
+  .sidebar-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list {
+    padding: 10px 20px;
+    position: relative;
+  }
+  
+  .sidebar-list .sidebar-link {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sidebar-link:hover {
+    background-color: #1abc9c;
+  }
+  
+  .sidebar-link .sidebar-icon {
+    margin-right: 10px;
+  }
+  
+  /* Submenu styles */
+  .has-submenu .submenu-arrow {
+    margin-left: auto;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar-submenu {
+    display: none;
+    list-style: none;
+    padding-left: 20px;
+  }
+  
+  .sidebar-submenu.open {
+    display: block;
+  }
+  
+  .sidebar-submenu li {
+    padding: 5px 0;
+  }
+  
+  .sidebar-submenu li a {
+    color: #bdc3c7;
+    text-decoration: none;
+  }
+  
+  .sidebar-submenu li a:hover {
+    background-color: #1abc9c;
+  }
+  
+  /* Back button and collapsible functionality */
+  .mobile-back {
+    display: none;
+  }
+  
+  .sidebar-wrapper.collapsed .mobile-back {
+    display: block;
+  }
+  
+  /* Responsive Design: Collapse sidebar for smaller screens */
+  @media (max-width: 768px) {
+    .sidebar-wrapper {
+      width: 0;
+      transition: width 0.3s ease;
+    }
+  
+    .sidebar-wrapper.collapsed {
+      width: 60px;
+    }
+  
+    .sidebar-main {
+      display: none;
+    }
+  
+    .sidebar-wrapper.collapsed .sidebar-main {
+      display: block;
+    }
+  
+    .sidebar-wrapper.collapsed .sidebar-links {
+      padding-top: 10px;
+    }
+  
+    .sidebar-wrapper.collapsed .sidebar-list .sidebar-link {
+      justify-content: center;
+    }
+  
+    .sidebar-wrapper.collapsed .submenu-arrow {
+      display: none;
+    }
+  
+    .back-btn {
+      padding: 10px;
+    }
+  
+    .sidebar-wrapper.collapsed .logo-wrapper {
+      padding: 10px;
+    }
+  }
+  

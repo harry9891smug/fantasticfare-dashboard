@@ -105,8 +105,9 @@ type PackageData = {
   _id: string;
   package_name: string;
   package_url: string;
-  from_country: string;
-  to_country: string;
+  country: string;
+  region: string;
+  continent: string;
   package_heading: string;
   package_image: string;
   total_price: string;

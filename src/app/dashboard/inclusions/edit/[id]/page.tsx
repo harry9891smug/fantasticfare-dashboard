@@ -1,4 +1,5 @@
 'use client';
+import React from 'react'
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -11,6 +12,7 @@ interface Inclusion {
     _id: string;
   }[];
 }
+
 
 const InclusionsEditor = () => {
   const { id } = useParams();
@@ -25,7 +27,7 @@ const InclusionsEditor = () => {
   useEffect(() => {
     const fetchInclusions = async () => {
       try {
-        const response = await axios.get(`https://backend.fantasticfare.com/api/package_view/${id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`);
         setInclusions(response.data.data.inclusion || []);
       } catch (error) {
         console.error('Error fetching inclusions:', error);
@@ -44,18 +46,14 @@ const InclusionsEditor = () => {
   ) => {
     const updatedInclusions = [...inclusions];
   
-    if (field === 'type') {
-      // Ensure value is a valid type
-      if (value === 'inclusion' || value === 'exclusion') {
-        updatedInclusions[inclusionIndex].types[itemIndex].type = value;
-      }
-    } else {
+    if (field === 'type' && (value === 'inclusion' || value === 'exclusion')) {
+      updatedInclusions[inclusionIndex].types[itemIndex].type = value;
+    } else if (field === 'description') {
       updatedInclusions[inclusionIndex].types[itemIndex].description = value;
     }
   
     setInclusions(updatedInclusions);
   };
-  
   
 
   const addNewItem = (inclusionIndex:any) => {
@@ -78,10 +76,10 @@ const InclusionsEditor = () => {
     setInclusions(updatedInclusions);
   };
 
-  const saveChanges = async () => {
+  const handleSubmit = async () => {
     setSaving(true);
     try {
-      await axios.put(`https://backend.fantasticfare.com/api/package_update/${id}/inclusions`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_update/${id}/inclusions`, {
         inclusion: inclusions
       });
       alert('Inclusions/Exclusions updated successfully!');
@@ -92,72 +90,80 @@ const InclusionsEditor = () => {
       setSaving(false);
     }
   };
-
   if (loading) return <div>Loading inclusions...</div>;
 
-  return (
-    <div className="editor-container">
-      <h2>Edit Inclusions & Exclusions</h2>
-      
-      {inclusions.map((inclusion, inclusionIndex) => (
-        <div key={inclusion._id} className="inclusion-group">
-          <h3>Inclusion Group {inclusionIndex + 1}</h3>
-          
-          <div className="add-new-item">
-            <select
-              value={newItem.type}
-              onChange={(e) => setNewItem({...newItem, type: e.target.value})}
-              className="type-select"
+
+
+  return (<div className="container-fluid">
+    <div className="card">
+      <div className="card-header">
+        <h5>Create Inclusions & Exclusions</h5>
+      </div>
+      <div className="card-body">
+        <form className="theme-form mega-form" onSubmit={handleSubmit}>
+         
+
+          {inclusions[0].types.map((item, index) => (
+            <div key={index} className="mb-4 border p-3 rounded">
+              <h6>Item {index + 1}</h6>
+              <div className="row">
+                <div className="col-sm-4">
+                  <label className="form-label-title">Type*</label>
+                  <select
+                    className="form-control"
+                    value={item.type}
+                    // onChange={(e) => handleInclusionChange(index, 'type', e.target.value)}
+                  >
+                    <option value="inclusion">Inclusion</option>
+                    <option value="exclusion">Exclusion</option>
+                  </select>
+                </div>
+                <div className="col-sm-8">
+                  <label className="form-label-title">Description*</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    value={item.description}
+                    // onChange={(e) => handleChange(index, 'description', e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              {/* {items.length > 1 && (
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm mt-2"
+                  onClick={() => handleRemoveItem(index)}
+                >
+                  Remove Item
+                </button>
+              )} */}
+            </div>
+          ))}
+
+          {/* <button
+            type="button"
+            className="btn btn-outline-primary mb-3"
+            onClick={handleAddItem}
+          >
+            Add Another Item
+          </button> */}
+
+          <div className="card-footer text-end">
+            <button type="submit" className="btn btn-primary me-3">Submit</button>
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              // onClick={() => router.push('/dashboard/packages')}
             >
-              <option value="inclusion">Inclusion</option>
-              <option value="exclusion">Exclusion</option>
-            </select>
-            <input
-              type="text"
-              value={newItem.description}
-              onChange={(e) => setNewItem({...newItem, description: e.target.value})}
-              placeholder="Enter description"
-              className="description-input"
-            />
-            <button 
-              onClick={() => addNewItem(inclusionIndex)}
-              className="add-btn"
-            >
-              Add Item
+              Cancel
             </button>
           </div>
-
-          <div className="items-list">
-            {inclusion.types.map((item, itemIndex) => (
-              <div key={item._id} className={`item-card ${item.type}`}>
-                <div className="item-type">{item.type.toUpperCase()}</div>
-                <input
-                  type="text"
-                  value={item.description}
-                  onChange={(e) => handleInclusionChange(inclusionIndex, itemIndex, 'description', e.target.value)}
-                  className="item-description"
-                />
-                <button 
-                  onClick={() => removeItem(inclusionIndex, itemIndex)} 
-                  className="remove-btn"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-
-      <button 
-        onClick={saveChanges} 
-        disabled={saving}
-        className="save-btn"
-      >
-        {saving ? 'Saving...' : 'Save Changes'}
-      </button>
+        </form>
+      </div>
     </div>
-  );
+  </div>
+)
 };
 
 export default InclusionsEditor;

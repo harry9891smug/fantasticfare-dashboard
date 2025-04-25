@@ -124,7 +124,6 @@ export default function NewPackage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
       setFormData(prev => ({ ...prev, [name]: value }))
-    console.log(formData)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -6,7 +6,7 @@ export default function Footer() {
 
             <div className="row">
                 <div className="col-md-12 footer-copyright text-center">
-                    <p className="mb-0">Copyright 2021 © Rica theme by pixelstrap </p>
+                    <p className="mb-0">© Copyright 2025 @ Fantastic Fare LLC </p>
                 </div>
             </div>
 

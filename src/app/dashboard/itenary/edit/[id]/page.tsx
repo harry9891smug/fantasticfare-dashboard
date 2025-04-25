@@ -16,7 +16,7 @@ interface Day {
 export default function EditItinerary() {
   const router = useRouter()
   const { id } = useParams() as { id: string }
-
+  const [itenary_id, setItenaryId] = useState<string | null>(null);
   const [itinerary, setItinerary] = useState<Day[]>([{
     day_name: '',
     day_description: '',
@@ -32,12 +32,12 @@ export default function EditItinerary() {
     const fetchItinerary = async () => {
       const token = localStorage.getItem('authToken')
       try {
-        const response = await axios.get(`https://backend.fantasticfare.com/api/package_view/${id}`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
-        })
-
+        }) 
+        setItenaryId(response.data.data.itineraries[0]._id);
         if (response.data.data.itineraries && response.data.data.itineraries.length > 0) {
           const existingItinerary: Day[] = response.data.data.itineraries[0].days.map((day: any) => ({
             ...day,
@@ -98,7 +98,11 @@ export default function EditItinerary() {
     const formData = new FormData()
 
     formData.append('package_id', id)
-
+    if(itenary_id){
+      formData.append('itenary_id', itenary_id)
+    }else{
+      alert('Something went wrong');
+    }
     itinerary.forEach((day, index) => {
       formData.append(`days[${index}][day_name]`, day.day_name)
       formData.append(`days[${index}][day_description]`, day.day_description)
@@ -114,13 +118,13 @@ export default function EditItinerary() {
     })
 
     try {
-      await axios.post(`https://backend.fantasticfare.com/api/itenary-create/${id}`, formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/itenary-create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       })
-      router.push('/dashboard/packages')
+      router.push(`/dashboard/packages/edit/${id}`)
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update itinerary')
     }
