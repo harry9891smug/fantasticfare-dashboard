@@ -10,7 +10,7 @@ interface Package {
   from_country: string
   to_country: string
   total_price: number
-  status: string
+  status: Number
 }
 
 export default function AllPackages() {
@@ -76,7 +76,7 @@ export default function AllPackages() {
                     <td>{index + 1}</td>
                     <td>{pkg.package_name}</td>
                     <td>${pkg.total_price}</td>
-                    <td>{pkg.status}</td>
+                    <td><span className={(pkg.status === 0) ? 'text-success':'text-danger' }>{(pkg.status === 0) ? "Active":'InActive'}</span></td>
                     <td>
                    
                     <Link href={`/dashboard/packages/edit/${pkg._id}`} className="me-2">

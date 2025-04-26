@@ -77,13 +77,13 @@ const PackageEditOptions = () => {
           </Link>
         </div>
 
-        <div className="option-card">
+        {/* <div className="option-card">
           <h3>Addons</h3>
           <p>Edit additional services or upgrades</p>
           <Link href={`/dashboard/addons/update/${id}`} className="edit-btn">
             Edit
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -28,7 +28,7 @@ const StaysEditor = () => {
   useEffect(() => {
     const fetchStays = async () => {
       try {
-        const response = await axios.get(`https://backend.fantasticfare.com/api/package_view/${id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`);
         setStays(response.data.data.stays || []);
       } catch (error) {
         console.error('Error fetching stays:', error);
@@ -102,7 +102,7 @@ const StaysEditor = () => {
   const saveChanges = async () => {
     setSaving(true);
     try {
-      await axios.put(`https://backend.fantasticfare.com/api/package_update/${id}/stays`, { stays });
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_update/${id}/stays`, { stays });
       alert('Stays updated successfully!');
     } catch (error) {
       console.error('Error updating stays:', error);

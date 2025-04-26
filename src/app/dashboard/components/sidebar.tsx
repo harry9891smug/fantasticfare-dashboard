@@ -60,28 +60,23 @@ export default function Sidebar() {
         { label: 'Add New Package', href: '/dashboard/packages/new' },
         { label: 'Addons', href: '/dashboard/addons' },
         { label: 'Packages', href: '/dashboard/packages' },
-        // { label: 'Itenary', href: '/dashboard/itenary' },
-        // { label: 'Stays', href: '/dashboard/stays' },
-        // { label: 'Activities', href: '/dashboard/activities' },
-        // { label: 'Inclusions', href: '/dashboard/inclusions' },
       ]
     },
-    { 
-      icon: <FiBriefcase size={18} />, 
-      label: 'Hotel',
-      href: '#',
-      subItems: [
-        { label: 'All Hotels', href: '/dashboard/hotels' },
-        { label: "Hotel's Detail", href: '/dashboard/hotels/detail' },
-        { label: 'Add New Hotel', href: '/dashboard/hotels/new' }
-      ]
-    },
+    // { 
+    //   icon: <FiBriefcase size={18} />, 
+    //   label: 'Hotel',
+    //   href: '#',
+    //   subItems: [
+    //     { label: 'All Hotels', href: '/dashboard/hotels' },
+    //     { label: "Hotel's Detail", href: '/dashboard/hotels/detail' },
+    //     { label: 'Add New Hotel', href: '/dashboard/hotels/new' }
+    //   ]
+    // },
     { 
       icon: <FiBookmark size={18} />, 
       label: 'Tips&Articles',
       href: '#',
       subItems: [
-
         { label: 'Add Articles', href: '/dashboard/blogs/new' },
         { label: 'All Articles', href: '/dashboard/blogs' },
       ]
@@ -167,11 +162,11 @@ export default function Sidebar() {
                       >
                         <span className="sidebar-icon">{item.icon}</span>
                         {!isCollapsed && <span className="sidebar-label">{item.label}</span>}
-                        {!isCollapsed && item.subItems && (
+                        {/* {!isCollapsed && item.subItems && (
                           <span className="submenu-arrow">
                             {activeSubmenu === item.label ? '−' : '+'}
                           </span>
-                        )}
+                        )} */}
                       </a>
                       {!isCollapsed && (
                         <ul className={`sidebar-submenu ${activeSubmenu === item.label ? 'open' : ''}`}>

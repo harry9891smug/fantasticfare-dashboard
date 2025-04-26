@@ -61,14 +61,14 @@ export default function EditActivities() {
       const token = localStorage.getItem('authToken')
       try {
         const response = await axios.get<ApiResponse>(
-          `https://backend.fantasticfare.com/api/package_view/${id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
             }
           }
         )
-  
+  console.log(response,'responseresponseresponseresponse')
         if (response.data.data.activities && response.data.data.activities.length > 0) {
           const existingActivities = response.data.data.activities.flatMap(
             (activityGroup: ActivityGroup) =>
@@ -190,7 +190,7 @@ export default function EditActivities() {
     })
 
     try {
-      await axios.put(`https://backend.fantasticfare.com/api/activity-update/${id}`, formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/activity-update/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
