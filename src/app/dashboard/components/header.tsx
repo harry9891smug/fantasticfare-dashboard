@@ -30,7 +30,7 @@ export default function Header() {
         </div>
 
         {/* Search form */}
-        <form className={`form-inline search-full col ${searchOpen ? 'open' : ''}`} action="#" method="get">
+        {/* <form className={`form-inline search-full col ${searchOpen ? 'open' : ''}`} action="#" method="get">
           <div className="form-group w-100">
             <div className="Typeahead Typeahead--twitterUsers">
               <div className="u-posRelative">
@@ -49,7 +49,7 @@ export default function Header() {
               <div className="Typeahead-menu"></div>
             </div>
           </div>
-        </form>
+        </form> */}
 
         {/* Right side navigation */}
         <div className="nav-right col-4 pull-right right-header p-0">
