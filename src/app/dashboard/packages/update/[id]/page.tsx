@@ -1,8 +1,7 @@
-'use client' 
+'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import axios from 'axios'
-import Image from 'next/image'
 
 type Addon = {
   _id: string
@@ -18,7 +17,8 @@ type FormData = {
   package_name: string
   package_url: string
   package_heading: string
-  package_image: File[] // Array of File objects
+  package_images: File[]
+  package_image: string[]
   total_price: string
   discounted_price: string
   meta_name: string
@@ -27,18 +27,19 @@ type FormData = {
   continent: string
   region: string
   country: string
-  package_id: string
+  _id?: string
 }
 
-export default function UpdatePackage() {
+export default function EditPackage() {
   const router = useRouter()
-  const { id } = useParams() // Get the package id from the URL
+  const { id } = useParams()
 
   const [formData, setFormData] = useState<FormData>({
     package_name: '',
     package_url: '',
     package_heading: '',
-    package_image: [], // Array of File objects
+    package_images: [],
+    package_image: [],
     total_price: '',
     discounted_price: '',
     meta_name: '',
@@ -46,8 +47,7 @@ export default function UpdatePackage() {
     addon_ids: [],
     continent: '',
     region: '',
-    country: '',
-    package_id: ''
+    country: ''
   })
 
   const [availableAddons, setAvailableAddons] = useState<Addon[]>([])
@@ -56,8 +56,12 @@ export default function UpdatePackage() {
   const [countries, setCountries] = useState<Country[]>([])
   const [error, setError] = useState('')
   const [loadingAddons, setLoadingAddons] = useState(true)
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>([])
+  const [existingImages, setExistingImages] = useState<string[]>([])
+
+  function IconRenderer({ iconClass }: { iconClass: string }) {
+    return <i className={iconClass} style={{ fontSize: '1.2rem' }} />
+  }
 
   const fetchPackageData = async () => {
     const token = localStorage.getItem('authToken')
@@ -66,34 +70,31 @@ export default function UpdatePackage() {
         headers: { Authorization: `Bearer ${token}` }
       })
       const packageData = res.data.data
+      
       setFormData({
         ...packageData,
-        package_image: [], // Reset package images for update
-        continent: packageData.continent, // Pre-select continent
-        region: packageData.region, // Pre-select region
-        country: packageData.country, // Pre-select country
+        package_images: [],
+        continent: packageData.continent,
+        region: packageData.region,
+        country: packageData.country,
       })
-  
-      const selectedContinent = packageData.continent
-      if (selectedContinent) {
-        // Fetch regions for the selected continent
-        const regionRes = await axios.get<{ data: Region[] }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/regions/${selectedContinent}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+
+      if (packageData.package_images?.length) {
+        setExistingImages(packageData.package_image)
+        setPreviewImages(packageData.package_image)
+      }
+
+      if (packageData.continent) {
+        const regionRes = await axios.get<{ data: Region[] }>(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/regions/${packageData.continent}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
         setRegions(regionRes.data.data)
       }
-      // setPreviewImages(Array.isArray(packageData.package_image) ? packageData.package_image : []) // Preload images
-      setPreviewImages(
-        Array.isArray(packageData.package_image)
-          ? packageData.package_image.map((file: File | string) =>
-              typeof file === 'string' ? file : URL.createObjectURL(file)
-            )
-          : []
-      )
-      
 
     } catch (err) {
       setError('Failed to load package data')
+      console.error(err)
     }
   }
 
@@ -140,12 +141,19 @@ export default function UpdatePackage() {
         })
         .then(res => {
           setRegions(res.data.data)
-          setFormData(prev => ({ ...prev, region: '', country: '' })) // Reset region and country
-          setCountries([]) // Clear countries on continent change
+          const currentRegionValid = res.data.data.some(r => String(r.id) === formData.region)
+          setFormData(prev => ({ 
+            ...prev, 
+            region: currentRegionValid ? prev.region : '',
+            country: currentRegionValid ? prev.country : '' 
+          }))
+          if (!currentRegionValid) {
+            setCountries([])
+          }
         })
         .catch(() => setError('Failed to load regions'))
     }
-  }, [formData.continent]) // Trigger when continent changes
+  }, [formData.continent])
 
   useEffect(() => {
     const token = localStorage.getItem('authToken')
@@ -159,7 +167,7 @@ export default function UpdatePackage() {
         })
         .catch(() => setError('Failed to load countries'))
     }
-  }, [formData.region]) 
+  }, [formData.region])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -169,31 +177,33 @@ export default function UpdatePackage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
-  
+
     const newImages = Array.from(files)
-    setSelectedImages(prev => [...prev, ...newImages])
-  
-    const newPreviews: Promise<string>[] = newImages.map(file => {
-      return new Promise((resolve) => {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          resolve(reader.result as string)
-        }
-        reader.readAsDataURL(file)
-      })
-    })
-  
-    Promise.all(newPreviews).then(previews => {
-      setPreviewImages(prev => [...prev, ...previews])
+    setFormData(prev => ({
+      ...prev,
+      package_images: [...prev.package_images, ...newImages]
+    }))
+
+    newImages.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        setPreviewImages(prev => [...prev, reader.result as string])
+      }
+      reader.readAsDataURL(file)
     })
   }
 
   const removeImage = (index: number) => {
-    setFormData(prev => {
-      const newImages = [...prev.package_image]
-      newImages.splice(index, 1)
-      return { ...prev, package_images: newImages }
-    })
+    if (index < existingImages.length) {
+      setExistingImages(prev => prev.filter((_, i) => i !== index))
+    } else {
+      setFormData(prev => {
+        const newImages = [...prev.package_images]
+        newImages.splice(index - existingImages.length, 1)
+        return { ...prev, package_images: newImages }
+      })
+    }
+    
     setPreviewImages(prev => {
       const newPreviews = [...prev]
       newPreviews.splice(index, 1)
@@ -212,6 +222,12 @@ export default function UpdatePackage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!formData.region || !formData.country) {
+      setError('Please select both region and country')
+      return
+    }
+
     setError('')
     const token = localStorage.getItem('authToken')
     if (!token) {
@@ -220,16 +236,17 @@ export default function UpdatePackage() {
     }
 
     const formDataObj = new FormData()
+    
     // Append all regular fields
     Object.entries(formData).forEach(([key, value]) => {
-      if (key !== 'package_images' && key !== 'addon_ids' && value !== null) {
+      if (key !== 'package_images' && key !== 'addon_ids' && key !== 'package_images' && value !== null) {
         formDataObj.append(key, String(value))
       }
     })
 
-    // Append all images
-    formData.package_image.forEach((image, index) => {
-      formDataObj.append(`package_image[]`, image)
+    // Append new images with correct field name
+    formData.package_images.forEach((image) => {
+      formDataObj.append('package_images[]', image) // Correct field name without brackets
     })
 
     // Append addon IDs
@@ -237,8 +254,19 @@ export default function UpdatePackage() {
       formDataObj.append('addon_ids[]', id)
     })
 
+    // Include _id for updates
+    if (id) {
+      formDataObj.append('_id', id.toString()); // Ensure string format
+    }
+
+    // Debug: Log FormData contents
+    for (let [key, value] of formDataObj.entries()) {
+      console.log(key, value)
+    }
+    
     try {
-      const response = await axios.post<{ package_id: string }>(
+      console.log('Submitting:', formDataObj);
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/package-create`,
         formDataObj,
         {
@@ -248,24 +276,36 @@ export default function UpdatePackage() {
           }
         }
       )
-      alert('Package Updated Successfully')
-      router.push(`/dashboard/packages/edit/${response.data.package_id}`)
-    } catch (err) {
-      setError('Failed to update package')
+      
+      alert(response.data.message || 'Package Updated Successfully')
+      router.push(`/dashboard/packages/edit/${id}`)
+    } catch (err: any) {
+      console.error('Update error:', err.response?.data || err.message)
+      setError(err.response?.data?.message || 'Failed to update package')
     }
   }
+
   return (
     <div className="container-fluid">
       <div className="card">
         <div className="card-header">
-          <h5>Update Package</h5>
+          <h5>Edit Package</h5>
         </div>
         <div className="card-body">
-          {error && <div className="alert alert-danger">{error}</div>}
+          {error && (
+            <div className="alert alert-danger">
+              {typeof error === 'string' ? error : (
+                <ul>
+                  {error.map((err: any, index: number) => (
+                    <li key={index}>{Object.values(err)[0]}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           <form className="theme-form mega-form" onSubmit={handleSubmit}>
             <div className="row">
-              {/* Dynamic Dropdowns */}
               <div className="col-sm-4">
                 <label className="form-label-title mt-3">Continent</label>
                 <select
@@ -307,7 +347,7 @@ export default function UpdatePackage() {
                   className="form-control"
                   name="country"
                   value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  onChange={handleChange}
                   disabled={!formData.region}
                 >
                   <option value="">Select Country</option>
@@ -319,7 +359,6 @@ export default function UpdatePackage() {
                 </select>
               </div>
 
-              {/* Other Fields */}
               {[
                 ['Package Name*', 'package_name'],
                 ['Package URL', 'package_url'],
@@ -354,7 +393,6 @@ export default function UpdatePackage() {
                 />
                 <small className="text-muted">You can select multiple images</small>
                 
-                {/* Image Previews */}
                 <div className="d-flex flex-wrap gap-3 mt-3">
                   {previewImages.map((preview, index) => (
                     <div key={index} className="position-relative" style={{ width: '150px', height: '150px' }}>
@@ -396,7 +434,7 @@ export default function UpdatePackage() {
                               onChange={() => handleAddonToggle(addon._id)}
                             />
                             <label className="form-check-label" htmlFor={`addon-${addon._id}`}>
-                              {addon.addon_name}
+                              <IconRenderer iconClass={addon.addon_icon} /> {addon.addon_name}
                             </label>
                           </div>
                         </div>
@@ -407,8 +445,17 @@ export default function UpdatePackage() {
               </div>
             </div>
 
-            <div className="card-footer text-end">
-              <button type="submit" className="btn btn-primary">Update Package</button>
+            <div className="card-footer text-end mt-4">
+              <button type="submit" className="btn btn-primary me-3">
+                Update Package
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-primary"
+                onClick={() => router.push('/dashboard/packages')}
+              >
+                Cancel
+              </button>
             </div>
           </form>
         </div>

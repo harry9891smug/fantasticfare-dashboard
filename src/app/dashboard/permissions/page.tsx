@@ -26,7 +26,7 @@ interface Permission {
             }
           
             try {
-              const response = await axios.get('https://backend.fantasticfare.com/api/permissions', {
+              const response = await axios.get('http://localhost:8000/api/permissions', {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -51,7 +51,7 @@ interface Permission {
         const token = localStorage.getItem('authToken')
       
         try {
-          await axios.delete(`https://backend.fantasticfare.com/api/delete-permission/${id}`, {
+          await axios.delete(`http://localhost:8000/api/delete-permission/${id}`, {
             headers: { Authorization: `${token}` }
           })
           alert('permission deleted successfully!')

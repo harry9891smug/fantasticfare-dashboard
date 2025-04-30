@@ -29,7 +29,7 @@ export default function ViewUser() {
       }
 
       try {
-        const response = await axios.get(`https://backend.fantasticfare.com/api/user/${userId}`, {
+        const response = await axios.get(`http://localhost:8000/api/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         setUser(response.data.user || null)

@@ -35,7 +35,7 @@ export default function AllAddons() {
       }
 
       try {
-        const response = await axios.get('https://backend.fantasticfare.com/api/package-addons', {
+        const response = await axios.get('http://localhost:8000/api/package-addons', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -62,7 +62,7 @@ export default function AllAddons() {
     const token = localStorage.getItem('authToken')
 
     try {
-      await axios.delete(`https://backend.fantasticfare.com/api/package-addons-delete/${id}`, {
+      await axios.delete(`http://localhost:8000/api/package-addons-delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       alert('Addon deleted successfully!')
