@@ -76,6 +76,13 @@ const PackageEditOptions = () => {
             Edit
           </Link>
         </div>
+        <div className="option-card">
+          <h3>FAQ's</h3>
+          <p>Edit Frequently asked questions</p>
+          <Link href={`/dashboard/faq/edit/${id}`} className="edit-btn">
+            Edit
+          </Link>
+        </div>
 
         {/* <div className="option-card">
           <h3>Addons</h3>

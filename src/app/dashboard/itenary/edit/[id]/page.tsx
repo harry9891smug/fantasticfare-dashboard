@@ -178,7 +178,10 @@ export default function EditItinerary() {
   
       // Existing images as JSON string
       if (day.existing_images.length > 0) {
-        formData.append(`existing_images[${index}]`, JSON.stringify(day.existing_images));
+        day.existing_images.forEach((imageName) => {
+          formData.append(`day_images[${index}]`, imageName);
+        });
+        // formData.append(`day_images[${index}]`, JSON.stringify(day.existing_images));
       }
   
       // New images
@@ -206,7 +209,8 @@ export default function EditItinerary() {
       );
       
       alert(response.data.message || 'Success!');
-      router.refresh();
+     router.push(`/dashboard/packages/${id}`)
+
     } catch (err: any) {
       console.error('Error:', err);
       setError(err.response?.data?.message || 'Update failed');

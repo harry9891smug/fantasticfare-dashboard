@@ -98,10 +98,10 @@ export default function NewActivity() {
     formData.append('package_id', id);
     activities.forEach((activity, index) => {
       formData.append(`day_name[${index}]`, activity.day_name);
-      formData.append(`day_activity[${index}]`, activity.day_activity);
+      formData.append(`day_activities[${index}]`, activity.day_activity);
       formData.append(`activity_type[${index}]`, activity.activity_type);
       activity.day_images.forEach(file => {
-        formData.append(`day_images[${index}][]`, file);
+        formData.append(`activity_images[${index}]`, file);
       });
     });
 

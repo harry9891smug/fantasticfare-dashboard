@@ -292,7 +292,7 @@ export default function EditPackage() {
           <h5>Edit Package</h5>
         </div>
         <div className="card-body">
-          {error && (
+          {/* {error && (
             <div className="alert alert-danger">
               {typeof error === 'string' ? error : (
                 <ul>
@@ -302,7 +302,7 @@ export default function EditPackage() {
                 </ul>
               )}
             </div>
-          )}
+          )} */}
 
           <form className="theme-form mega-form" onSubmit={handleSubmit}>
             <div className="row">
