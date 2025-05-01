@@ -70,7 +70,7 @@ export default function EditPackage() {
         headers: { Authorization: `Bearer ${token}` }
       })
       const packageData = res.data.data
-      
+      console.log(packageData)
       setFormData({
         ...packageData,
         package_images: [],
@@ -79,7 +79,7 @@ export default function EditPackage() {
         country: packageData.country,
       })
 
-      if (packageData.package_images?.length) {
+      if (packageData.package_image?.length) {
         setExistingImages(packageData.package_image)
         setPreviewImages(packageData.package_image)
       }
@@ -239,7 +239,7 @@ export default function EditPackage() {
     
     // Append all regular fields
     Object.entries(formData).forEach(([key, value]) => {
-      if (key !== 'package_images' && key !== 'addon_ids' && key !== 'package_images' && value !== null) {
+      if (key !== 'package_images' && key !== 'addon_ids' && key !== '_id' && value !== null) {
         formDataObj.append(key, String(value))
       }
     })
@@ -260,12 +260,12 @@ export default function EditPackage() {
     }
 
     // Debug: Log FormData contents
-    for (let [key, value] of formDataObj.entries()) {
-      console.log(key, value)
-    }
+    // for (let [key, value] of formDataObj.entries()) {
+    //   console.log(key, value)
+    // }
     
     try {
-      console.log('Submitting:', formDataObj);
+     // console.log('Submitting:', formDataObj);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/package-create`,
         formDataObj,
