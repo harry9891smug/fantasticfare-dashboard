@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
 
-// Types
 interface StayDay {
   _id: string;
   hotel_name: string;
@@ -50,7 +49,6 @@ const StaysEditor = () => {
     updatedStays[stayIndex].days[dayIndex][field] = value;
     setStays(updatedStays);
   };
-  
 
   const addNewStay = () => {
     const timestamp = Date.now();
@@ -112,89 +110,120 @@ const StaysEditor = () => {
     }
   };
 
-  if (loading) return <div>Loading stays...</div>;
+  if (loading) return <div className="text-center py-10 text-gray-600">Loading stays...</div>;
 
   return (
-    <div className="editor-container">
-      <h2>Edit Stays</h2>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Edit Stays</h2>
 
-      <button onClick={addNewStay} className="add-btn">
+      <button
+        onClick={addNewStay}
+        className="mb-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+      >
         Add New Stay Group
       </button>
 
-      {stays.map((stay, stayIndex) => (
-        <div key={stay._id} className="stay-group">
-          <div className="group-header">
-            <h3>Stay Group {stayIndex + 1}</h3>
-            <button onClick={() => removeStay(stayIndex)} className="remove-btn">
-              Remove Group
+      <div className="space-y-8">
+        {stays.map((stay, stayIndex) => (
+          <div key={stay._id} className="bg-white shadow rounded-lg p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-700">Stay Group {stayIndex + 1}</h3>
+              <button
+                onClick={() => removeStay(stayIndex)}
+                className="text-red-600 hover:underline text-sm"
+              >
+                Remove Group
+              </button>
+            </div>
+
+            <button
+              onClick={() => addDayToStay(stayIndex)}
+              className="mb-4 text-blue-600 hover:underline text-sm"
+            >
+              + Add Day
             </button>
-          </div>
 
-          <button onClick={() => addDayToStay(stayIndex)} className="add-day-btn">
-            Add Day to This Stay
-          </button>
-
-          {stay.days.map((day, dayIndex) => (
-            <div key={day._id} className="day-card">
-              <input
-                type="text"
-                value={day.hotel_name}
-                onChange={(e) =>
-                  handleStayChange(stayIndex, dayIndex, 'hotel_name', e.target.value)
-                }
-                placeholder="Hotel Name"
-                className="hotel-name"
-              />
-
-              <textarea
-                value={day.hotel_description}
-                onChange={(e) =>
-                  handleStayChange(stayIndex, dayIndex, 'hotel_description', e.target.value)
-                }
-                placeholder="Hotel Description..."
-                className="hotel-description"
-              />
-
-              <div className="hotel-images">
-                {day.hotel_images.map((img, imgIndex) => (
-                  <div key={imgIndex} className="image-preview">
-                    <Image src={img} alt={`Hotel ${dayIndex + 1}`} height={200} width={300} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {stay.days.map((day, dayIndex) => (
+                <div key={day._id} className="border rounded-lg p-4 relative bg-gray-50">
+                  <div className="absolute top-2 right-2">
                     <button
-                      onClick={() => removeImageFromDay(stayIndex, dayIndex, imgIndex)}
-                      className="remove-image-btn"
+                      onClick={() => removeDayFromStay(stayIndex, dayIndex)}
+                      className="text-red-500 hover:text-red-700"
                     >
                       ×
                     </button>
                   </div>
-                ))}
-                {/* TODO: Add image upload component here */}
-              </div>
 
-              <select
-                value={day.stay_type}
-                onChange={(e) =>
-                  handleStayChange(stayIndex, dayIndex, 'stay_type', e.target.value)
-                }
-                className="type-select"
-              >
-                <option value="standard">Standard</option>
-                <option value="luxury">Luxury</option>
-                <option value="resort">Resort</option>
-              </select>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Hotel Name</label>
+                  <input
+                    type="text"
+                    value={day.hotel_name}
+                    onChange={(e) =>
+                      handleStayChange(stayIndex, dayIndex, 'hotel_name', e.target.value)
+                    }
+                    className="w-full border rounded px-3 py-2 mb-3"
+                    placeholder="Hotel Name"
+                  />
 
-              <button
-                onClick={() => removeDayFromStay(stayIndex, dayIndex)}
-                className="remove-day-btn"
-              >
-                Remove This Day
-              </button>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                  <textarea
+                    value={day.hotel_description}
+                    onChange={(e) =>
+                      handleStayChange(stayIndex, dayIndex, 'hotel_description', e.target.value)
+                    }
+                    className="w-full border rounded px-3 py-2 mb-3"
+                    placeholder="Hotel Description"
+                  />
+
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Stay Type</label>
+                  <select
+                    value={day.stay_type}
+                    onChange={(e) =>
+                      handleStayChange(stayIndex, dayIndex, 'stay_type', e.target.value)
+                    }
+                    className="w-full border rounded px-3 py-2 mb-3"
+                  >
+                    <option value="standard">Standard</option>
+                    <option value="luxury">Luxury</option>
+                    <option value="resort">Resort</option>
+                  </select>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {day.hotel_images.map((img, imgIndex) => (
+                      <div key={imgIndex} className="relative">
+                        <Image
+                          src={img}
+                          alt={`Hotel ${dayIndex + 1}`}
+                          height={150}
+                          width={200}
+                          className="rounded object-cover"
+                        />
+                        <button
+                          onClick={() => removeImageFromDay(stayIndex, dayIndex, imgIndex)}
+                          className="absolute top-1 right-1 bg-white text-red-500 text-xs px-1 rounded"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    {/* Image upload placeholder */}
+                    <div className="border border-dashed border-gray-300 rounded p-4 text-center text-sm text-gray-500">
+                      + Upload Image
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
 
-      <button onClick={saveChanges} disabled={saving} className="save-btn">
+      <button
+        onClick={saveChanges}
+        disabled={saving}
+        className="mt-8 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+      >
         {saving ? 'Saving...' : 'Save Changes'}
       </button>
     </div>

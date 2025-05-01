@@ -26,7 +26,7 @@ interface Role {
             }
           
             try {
-              const response = await axios.get('https://backend.fantasticfare.com/api/roles', {
+              const response = await axios.get('http://localhost:8000/api/roles', {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -51,7 +51,7 @@ interface Role {
         const token = localStorage.getItem('authToken')
       
         try {
-          await axios.delete(`https://backend.fantasticfare.com/api/delete-role/${id}`, {
+          await axios.delete(`http://localhost:8000/api/delete-role/${id}`, {
             headers: { Authorization: `${token}` }
           })
           alert('Role deleted successfully!')

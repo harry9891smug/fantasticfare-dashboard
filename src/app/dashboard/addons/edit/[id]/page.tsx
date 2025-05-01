@@ -22,7 +22,7 @@ export default function EditAddons() {
       }
 
       const response = await axios.get(
-        `https://backend.fantasticfare.com/api/package-addons-view/${id}`, 
+        `http://localhost:8000/api/package-addons-view/${id}`, 
         {
           headers: { 
             Authorization: `Bearer ${token}` 
@@ -64,7 +64,7 @@ export default function EditAddons() {
       }
 
       await axios.put(
-        `https://backend.fantasticfare.com/api/package-addons-update/${id}`,
+        `http://localhost:8000/api/package-addons-update/${id}`,
         updateData,
         {
           headers: {

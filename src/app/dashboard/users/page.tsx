@@ -28,7 +28,7 @@ interface User {
             }
           
             try {
-              const response = await axios.get('https://backend.fantasticfare.com/api/list-users', {
+              const response = await axios.get('http://localhost:8000/api/list-users', {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -53,7 +53,7 @@ interface User {
         const token = localStorage.getItem('authToken')
       
         try {
-          await axios.delete(`https://backend.fantasticfare.com/api/delete-user/${id}`, {
+          await axios.delete(`http://localhost:8000/api/delete-user/${id}`, {
             headers: { Authorization: `${token}` }
           })
           alert('user deleted successfully!')

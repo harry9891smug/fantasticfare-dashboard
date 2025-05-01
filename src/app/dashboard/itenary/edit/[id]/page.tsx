@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import axios from 'axios'
 import Image from 'next/image'
@@ -11,6 +11,7 @@ interface Day {
   itinerary_type: string
   day_images: File[] // for new uploads
   existing_images: string[] // for already uploaded image URLs
+  preview_images?: string[] // for preview of newly uploaded images
 }
 
 export default function EditItinerary() {
@@ -22,11 +23,14 @@ export default function EditItinerary() {
     day_description: '',
     itinerary_type: 'solo',
     day_images: [],
-    existing_images: []
+    existing_images: [],
+    preview_images: []
   }])
 
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
     const fetchItinerary = async () => {
@@ -37,12 +41,15 @@ export default function EditItinerary() {
             Authorization: `Bearer ${token}`
           }
         }) 
-        setItenaryId(response.data.data.itineraries[0]._id);
         if (response.data.data.itineraries && response.data.data.itineraries.length > 0) {
+          setItenaryId(response.data.data.itineraries[0]._id)
           const existingItinerary: Day[] = response.data.data.itineraries[0].days.map((day: any) => ({
-            ...day,
+            day_name: day.day_name || '',
+            day_description: day.day_description || '',
+            itinerary_type: day.itinerary_type || 'solo',
             existing_images: day.day_images || [],
-            day_images: []
+            day_images: [],
+            preview_images: []
           }))
           setItinerary(existingItinerary)
         }
@@ -62,26 +69,45 @@ export default function EditItinerary() {
       day_description: '',
       itinerary_type: 'solo',
       day_images: [],
-      existing_images: []
+      existing_images: [],
+      preview_images: []
     }])
   }
 
   const handleRemoveDay = (index: number) => {
     if (itinerary.length > 1) {
-      setItinerary(itinerary.filter((_, i) => i !== index))
+      const updated = [...itinerary]
+      updated.splice(index, 1)
+      setItinerary(updated)
+      fileInputRefs.current.splice(index, 1)
     }
   }
 
   const handleDayChange = (index: number, field: keyof Day, value: any) => {
     const updated = [...itinerary]
-    updated[index][field] = value
+    updated[index] = {
+      ...updated[index],
+      [field]: value
+    }
     setItinerary(updated)
   }
 
-  const handleFileChange = (index: number, files: FileList) => {
-    const updated = [...itinerary]
-    updated[index].day_images = Array.from(files)
-    setItinerary(updated)
+  const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files)
+      const updated = [...itinerary]
+      
+      // Create preview URLs
+      const previews = files.map(file => URL.createObjectURL(file))
+      
+      updated[index] = {
+        ...updated[index],
+        day_images: [...updated[index].day_images, ...files],
+        preview_images: [...(updated[index].preview_images || []), ...previews]
+      }
+      
+      setItinerary(updated)
+    }
   }
 
   const removeExistingImage = (dayIndex: number, imageIndex: number) => {
@@ -92,43 +118,111 @@ export default function EditItinerary() {
     setItinerary(updated)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const token = localStorage.getItem('authToken')
-    const formData = new FormData()
-
-    formData.append('package_id', id)
-    if(itenary_id){
-      formData.append('itenary_id', itenary_id)
-    }else{
-      alert('Something went wrong');
+  const removeNewImage = (dayIndex: number, imageIndex: number) => {
+    const updated = [...itinerary]
+    
+    // Revoke the object URL to prevent memory leaks
+    if (updated[dayIndex].preview_images?.[imageIndex]) {
+      URL.revokeObjectURL(updated[dayIndex].preview_images![imageIndex])
     }
-    itinerary.forEach((day, index) => {
-      formData.append(`days[${index}][day_name]`, day.day_name)
-      formData.append(`days[${index}][day_description]`, day.day_description)
-      formData.append(`days[${index}][itinerary_type]`, day.itinerary_type)
-
-      day.existing_images.forEach((img, imgIndex) => {
-        formData.append(`days[${index}][existing_images][${imgIndex}]`, img)
-      })
-
-      day.day_images.forEach(file => {
-        formData.append(`days[${index}][day_images]`, file)
-      })
-    })
-
-    try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/itenary-create`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      router.push(`/dashboard/packages/edit/${id}`)
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update itinerary')
+    
+    updated[dayIndex].day_images.splice(imageIndex, 1)
+    updated[dayIndex].preview_images?.splice(imageIndex, 1)
+    setItinerary(updated)
+    
+    // Reset file input
+    if (fileInputRefs.current[dayIndex]) {
+      fileInputRefs.current[dayIndex]!.value = ''
     }
   }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+  
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+  
+    // Validate at least one day exists
+    if (itinerary.length === 0) {
+      setError('At least one day is required');
+      setIsSubmitting(false);
+      return;
+    }
+  
+    const formData = new FormData();
+    
+    // REQUIRED: Add package_id
+    formData.append('package_id', id);
+    
+    // Add itenary_id if exists
+    if (itenary_id) {
+      formData.append('itenary_id', itenary_id);
+    }
+  
+    // Append each day's data
+    itinerary.forEach((day, index) => {
+      // REQUIRED fields for each day
+      if (!day.day_name || !day.day_description || !day.itinerary_type) {
+        setError(`Day ${index + 1} is missing required fields`);
+        return;
+      }
+  
+      formData.append(`day_name[${index}]`, day.day_name);
+      formData.append(`day_description[${index}]`, day.day_description);
+      formData.append(`itenary_type[${index}]`, day.itinerary_type);
+  
+      // Existing images as JSON string
+      if (day.existing_images.length > 0) {
+        formData.append(`existing_images[${index}]`, JSON.stringify(day.existing_images));
+      }
+  
+      // New images
+      day.day_images.forEach((file) => {
+        formData.append(`day_images[${index}]`, file);
+      });
+    });
+  
+    // Debug: Verify all required fields
+    console.log('FormData contents:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value instanceof File ? value.name : value);
+    }
+  
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/itenary-create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      alert(response.data.message || 'Success!');
+      router.refresh();
+    } catch (err: any) {
+      console.error('Error:', err);
+      setError(err.response?.data?.message || 'Update failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Clean up object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      itinerary.forEach(day => {
+        day.preview_images?.forEach(url => URL.revokeObjectURL(url))
+      })
+    }
+  }, [itinerary])
 
   if (loading) {
     return (
@@ -191,7 +285,9 @@ export default function EditItinerary() {
                       className="form-control"
                       type="file"
                       multiple
-                      onChange={(e) => handleFileChange(index, e.target.files!)}
+                      onChange={(e) => handleFileChange(index, e)}
+                      ref={el => fileInputRefs.current[index] = el}
+                      accept="image/*"
                     />
                   </div>
                 </div>
@@ -207,25 +303,53 @@ export default function EditItinerary() {
                   />
                 </div>
 
+                {/* Existing Images */}
                 {day.existing_images.length > 0 && (
                   <div className="mt-3">
                     <label className="form-label-title">Existing Images</label>
                     <div className="d-flex flex-wrap gap-2">
                       {day.existing_images.map((img, imgIndex) => (
-                        <div key={imgIndex} className="position-relative" style={{ width: '100px' }}>
+                        <div key={`existing-${imgIndex}`} className="position-relative" style={{ width: '100px' }}>
                           <Image
                             src={img}
                             alt={`Day ${index + 1} Image ${imgIndex + 1}`}
                             className="img-thumbnail"
                             style={{ height: '100px', objectFit: 'cover' }}
-                            width={300}
-                            height={200}
+                            width={100}
+                            height={100}
                           />
                           <button
                             type="button"
                             className="position-absolute top-0 end-0 btn btn-danger btn-sm p-0"
                             style={{ width: '20px', height: '20px' }}
                             onClick={() => removeExistingImage(index, imgIndex)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* New Image Previews */}
+                {day.preview_images && day.preview_images.length > 0 && (
+                  <div className="mt-3">
+                    <label className="form-label-title">New Images to Upload</label>
+                    <div className="d-flex flex-wrap gap-2">
+                      {day.preview_images.map((preview, previewIndex) => (
+                        <div key={`preview-${previewIndex}`} className="position-relative" style={{ width: '100px' }}>
+                          <img
+                            src={preview}
+                            alt={`New image preview ${previewIndex + 1}`}
+                            className="img-thumbnail"
+                            style={{ height: '100px', objectFit: 'cover', width: '100%' }}
+                          />
+                          <button
+                            type="button"
+                            className="position-absolute top-0 end-0 btn btn-danger btn-sm p-0"
+                            style={{ width: '20px', height: '20px' }}
+                            onClick={() => removeNewImage(index, previewIndex)}
                           >
                             ×
                           </button>
@@ -264,8 +388,12 @@ export default function EditItinerary() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  Update Itinerary
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Updating...' : 'Update Itinerary'}
                 </button>
               </div>
             </div>

@@ -20,7 +20,7 @@ export default function EditRole() {
   const fetchRole = useCallback(async () => {
     if (!id) return
     try {
-      const response = await axios.get(`https://backend.fantasticfare.com/api/view-role/${id}`, {
+      const response = await axios.get(`http://localhost:8000/api/view-role/${id}`, {
         headers: { Authorization: `${token}` }
       })
       setRoleData(response.data.data)
@@ -43,7 +43,7 @@ export default function EditRole() {
     const { _id, createdAt, updatedAt, __v, ...updatedData } = roleData
 
     try {
-      await axios.put(`https://backend.fantasticfare.com/api/update-role/${id}`, updatedData, {
+      await axios.put(`http://localhost:8000/api/update-role/${id}`, updatedData, {
         headers: {
           Authorization: `${token}`,
           'Content-Type': 'application/json'
