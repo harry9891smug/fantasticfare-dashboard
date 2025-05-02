@@ -86,7 +86,7 @@ interface Permission {
                       <th>#</th>
                       <th>Permission Name</th>
 
-                      <th>Status</th>
+                      {/* <th>Status</th> */}
                       <th>View</th>
                       {/* <th>Edit</th> */}
                       <th>Delete</th>
@@ -98,7 +98,7 @@ interface Permission {
                             <tr key={perm._id}>
                             <td>{index + 1}</td>
                             <td>{perm.permission_name || "N/A"}</td>
-                            <td>{perm.status || "Inactive"}</td>
+                            {/* <td>{perm.status || "Inactive"}</td> */}
 
                             <td>
                                 <Link href={`/dashboard/permissions/edit/${perm._id}`}>
