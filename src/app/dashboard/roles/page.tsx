@@ -26,7 +26,7 @@ interface Role {
             }
           
             try {
-              const response = await axios.get('http://localhost:8000/api/roles', {
+              const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/roles`, {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
@@ -51,7 +51,7 @@ interface Role {
         const token = localStorage.getItem('authToken')
       
         try {
-          await axios.delete(`http://localhost:8000/api/delete-role/${id}`, {
+          await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/delete-role/${id}`, {
             headers: { Authorization: `${token}` }
           })
           alert('Role deleted successfully!')

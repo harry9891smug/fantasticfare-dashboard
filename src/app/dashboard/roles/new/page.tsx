@@ -20,7 +20,7 @@ export default function AddRole() {
     const token = localStorage.getItem('authToken') // Get token
 
     try {
-      await axios.post('http://localhost:8000/api/create-role', roleData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/create-role`, roleData, {
         headers: { Authorization: `${token}`, 'Content-Type': 'application/json' }
       })
       alert('Role created successfully!')

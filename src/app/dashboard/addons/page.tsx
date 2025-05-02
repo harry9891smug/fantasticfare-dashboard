@@ -35,7 +35,7 @@ export default function AllAddons() {
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/api/package-addons', {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package-addons`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -62,7 +62,7 @@ export default function AllAddons() {
     const token = localStorage.getItem('authToken')
 
     try {
-      await axios.delete(`http://localhost:8000/api/package-addons-delete/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package-addons-delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       alert('Addon deleted successfully!')

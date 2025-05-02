@@ -26,7 +26,7 @@ const InclusionsEditor = () => {
   useEffect(() => {
     const fetchInclusions = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/package_view/${id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`);
         setInclusions(response.data.data.inclusion || []);
       } catch (error) {
         console.error('Error fetching inclusions:', error);
@@ -78,7 +78,7 @@ const InclusionsEditor = () => {
   const saveChanges = async () => {
     setSaving(true);
     try {
-      await axios.put(`http://localhost:8000/api/package_update/${id}/inclusions`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_update/${id}/inclusions`, {
         inclusion: inclusions
       });
       alert('Inclusions/Exclusions updated successfully!');
