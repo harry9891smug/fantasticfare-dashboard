@@ -101,7 +101,7 @@ interface Permission {
                             <td>{perm.status || "Inactive"}</td>
 
                             <td>
-                                <Link href={`/dashboard/roles/edit/${perm._id}`}>
+                                <Link href={`/dashboard/permissions/edit/${perm._id}`}>
                                 <FiEye className="text-primary" />
                                 </Link>
                             </td>

@@ -21,12 +21,12 @@ export default function EditRole() {
   const fetchRole = useCallback(async () => {
     if (!id) return
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/view-permission/users`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/view-permission/${id}`, {
         headers: { Authorization: `${token}` }
       })
       setPermissionData(response.data.data)
     } catch (error) {
-      alert('Failed to fetch role')
+      alert('Failed to fetch permission')
     }
   }, [id, token]) // ✅ included dependencies
 
