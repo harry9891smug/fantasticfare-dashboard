@@ -61,7 +61,7 @@ export default function NewStay() {
     })
 
     try {
-      await axios.post('http://localhost:8000/api/stay-create', formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/stay-create`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

@@ -200,7 +200,7 @@ export default function AddArticle() {
                           const formData = new FormData()
                           formData.append('file', blobInfo.blob(), blobInfo.filename())
                           
-                          axios.post('http://localhost:8000/api/upload-image', formData, {
+                          axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload-image`, formData, {
                             headers: {
                               'Content-Type': 'multipart/form-data'
                             }

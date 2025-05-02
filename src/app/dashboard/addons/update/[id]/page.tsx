@@ -35,8 +35,8 @@ export default function EditAddons() {
         const headers = { Authorization: `Bearer ${token}` }
   
         const [packageRes, addonsRes] = await Promise.all([
-          axios.get(`http://localhost:8000/api/package_view/${id}`, { headers }),
-          axios.get('http://localhost:8000/api/package-addons', { headers })
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package_view/${id}`, { headers }),
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/package-addons`, { headers })
         ])
   
         if (packageRes.data.status && addonsRes.data.status) {
@@ -63,7 +63,7 @@ export default function EditAddons() {
     try {
       setLoading(true)
       await axios.post(
-        `http://localhost:8000/api/package_update/${id}/addons`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/package_update/${id}/addons`,
         {
           action: checked ? 'add' : 'remove',
           addon_id: addonId

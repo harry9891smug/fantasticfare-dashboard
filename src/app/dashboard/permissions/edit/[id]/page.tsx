@@ -21,7 +21,7 @@ export default function EditRole() {
   const fetchRole = useCallback(async () => {
     if (!id) return
     try {
-      const response = await axios.get(`http://localhost:8000/api/view-permission/users`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/view-permission/users`, {
         headers: { Authorization: `${token}` }
       })
       setPermissionData(response.data.data)
@@ -44,7 +44,7 @@ export default function EditRole() {
     const { _id, createdAt, updatedAt, __v, ...updatedData } = permissionData
 
     try {
-      await axios.put(`http://localhost:8000/api/update-permission/users`, updatedData, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/update-permission/users`, updatedData, {
         headers: {
           Authorization: `${token}`,
           'Content-Type': 'application/json'

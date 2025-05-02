@@ -29,7 +29,7 @@ export default function ViewUser() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/${userId}`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         setUser(response.data.user || null)
