@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import axios from 'axios'
 import Image from 'next/image'
+import { Editor } from '@tinymce/tinymce-react'
 
 interface Day {
   day_name: string
@@ -298,13 +299,56 @@ export default function EditItinerary() {
 
                 <div className="mt-2">
                   <label className="form-label-title">Description*</label>
-                  <textarea
+                  {/* <textarea
                     className="form-control"
                     rows={3}
                     value={day.day_description}
                     onChange={(e) => handleDayChange(index, 'day_description', e.target.value)}
                     required
-                  />
+                  /> */}
+                  <Editor
+                      apiKey="8brh26vfpwcwn8uphb1cilw3anjhw5ly5ghwc5js1gsl2vjh"
+                      value={day.day_description}
+                      onEditorChange={(newContent: any) =>
+                        handleDayChange(index, 'day_description', newContent)
+                      }
+                      init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                          'advlist autolink lists link image charmap print preview anchor',
+                          'searchreplace visualblocks code fullscreen',
+                          'insertdatetime media table paste code help wordcount',
+                        ],
+                        toolbar:
+                          'undo redo | formatselect | ' +
+                          'bold italic backcolor | alignleft aligncenter ' +
+                          'alignright alignjustify | bullist numlist outdent indent | ' +
+                          'removeformat | help',
+                        content_style:
+                          'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                        images_upload_handler: async (blobInfo: any, progress: any) => {
+                          return new Promise((resolve, reject) => {
+                            const formData = new FormData();
+                            formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                            axios
+                              .post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload-image`, formData, {
+                                headers: {
+                                  'Content-Type': 'multipart/form-data',
+                                },
+                              })
+                              .then((response) => {
+                                resolve(response.data.location);
+                              })
+                              .catch((error) => {
+                                reject('Image upload failed');
+                                console.error(error);
+                              });
+                          });
+                        },
+                      }}
+                    />
                 </div>
 
                 {/* Existing Images */}
