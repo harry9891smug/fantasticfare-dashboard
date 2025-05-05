@@ -62,6 +62,7 @@ export default function Sidebar() {
         { label: 'Packages', href: '/dashboard/packages' },
       ]
     },
+    
     // { 
     //   icon: <FiBriefcase size={18} />, 
     //   label: 'Hotel',
@@ -80,7 +81,21 @@ export default function Sidebar() {
         { label: 'Add Articles', href: '/dashboard/blogs/new' },
         { label: 'All Articles', href: '/dashboard/blogs' },
       ]
-    }
+    },
+    { 
+      icon: <FiSettings size={18} />, 
+      label: 'Enquiries',
+      href: '#',
+      subItems: [
+        { label: 'All Enquires', href: '/dashboard/enquiries' },
+      ]
+    },
+    { 
+      icon: <FiPlusCircle size={18} />, 
+      label: 'Add Image to Country', 
+      href: '/dashboard/country',
+      subItems: null
+    },
   ]
 
   if (!isMounted) return null
