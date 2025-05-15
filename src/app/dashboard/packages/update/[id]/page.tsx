@@ -196,6 +196,11 @@ export default function EditPackage() {
   const removeImage = (index: number) => {
     if (index < existingImages.length) {
       setExistingImages(prev => prev.filter((_, i) => i !== index))
+      setFormData(prev => {
+        const newImages = [...prev.package_images]
+        newImages.splice(index - existingImages.length, 1)
+        return { ...prev, package_images: newImages }
+      })
     } else {
       setFormData(prev => {
         const newImages = [...prev.package_images]
@@ -244,6 +249,9 @@ export default function EditPackage() {
       }
     })
 
+    existingImages.forEach((image) => {
+      formDataObj.append('existing_package_image[]', image) // Correct field name without brackets
+    })
     // Append new images with correct field name
     formData.package_images.forEach((image) => {
       formDataObj.append('package_images[]', image) // Correct field name without brackets
