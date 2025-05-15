@@ -9,7 +9,7 @@ import { Editor } from '@tinymce/tinymce-react'
 interface Day {
   day_name: string
   day_description: string
-  itinerary_type: string
+  itenary_type: string
   day_images: File[] // for new uploads
   existing_images: string[] // for already uploaded image URLs
   preview_images?: string[] // for preview of newly uploaded images
@@ -22,7 +22,7 @@ export default function EditItinerary() {
   const [itinerary, setItinerary] = useState<Day[]>([{
     day_name: '',
     day_description: '',
-    itinerary_type: 'solo',
+    itenary_type: '',
     day_images: [],
     existing_images: [],
     preview_images: []
@@ -47,7 +47,7 @@ export default function EditItinerary() {
           const existingItinerary: Day[] = response.data.data.itineraries[0].days.map((day: any) => ({
             day_name: day.day_name || '',
             day_description: day.day_description || '',
-            itinerary_type: day.itinerary_type || 'solo',
+            itenary_type: day.itenary_type || '',
             existing_images: day.day_images || [],
             day_images: [],
             preview_images: []
@@ -68,7 +68,7 @@ export default function EditItinerary() {
     setItinerary([...itinerary, {
       day_name: '',
       day_description: '',
-      itinerary_type: 'solo',
+      itenary_type: 'solo',
       day_images: [],
       existing_images: [],
       preview_images: []
@@ -168,14 +168,14 @@ export default function EditItinerary() {
     // Append each day's data
     itinerary.forEach((day, index) => {
       // REQUIRED fields for each day
-      if (!day.day_name || !day.day_description || !day.itinerary_type) {
+      if (!day.day_name || !day.day_description || !day.itenary_type) {
         setError(`Day ${index + 1} is missing required fields`);
         return;
       }
   
       formData.append(`day_name[${index}]`, day.day_name);
       formData.append(`day_description[${index}]`, day.day_description);
-      formData.append(`itenary_type[${index}]`, day.itinerary_type);
+      formData.append(`itenary_type[${index}]`, day.itenary_type);
   
       // Existing images as JSON string
       if (day.existing_images.length > 0) {
@@ -273,11 +273,11 @@ export default function EditItinerary() {
                     />
                   </div>
                   <div className="col-sm-4">
-                    <label className="form-label-title">Type*</label>
+                    <label className="form-label-title">Type*</label> 
                     <select
                       className="form-control"
-                      value={day.itinerary_type}
-                      onChange={(e) => handleDayChange(index, 'itinerary_type', e.target.value)}
+                      value={day.itenary_type}
+                      onChange={(e) => handleDayChange(index, 'itenary_type', e.target.value)}
                     >
                       <option value="solo">Solo</option>
                       <option value="family">Family</option>

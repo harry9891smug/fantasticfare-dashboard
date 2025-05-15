@@ -96,6 +96,12 @@ export default function Sidebar() {
       href: '/dashboard/country',
       subItems: null
     },
+    // { 
+    //   icon: <FiSettings size={18} />, 
+    //   label: 'Rules', 
+    //   href: '/dashboard/rules',
+    //   subItems: null
+    // },
   ]
 
   if (!isMounted) return null
