@@ -13,6 +13,7 @@ interface Countries {
 interface Cities {
   id: string;
   name: string;
+  code:string
 }
 interface FlightRuleProps {
   conditions: {
@@ -36,7 +37,8 @@ export default function FlightRule({ conditions, onFormDataChange }: FlightRuleP
   const [error, setError] = useState('');
   const [destinationCities, setDestinationCities] = useState<Cities[]>([]);
   const [originCities, setOriginCities] = useState<Cities[]>([]);
-
+  const [countryNames,setcountryNames] = useState<String[]>([]);
+  onFormDataChange
 
   useEffect(() => {
     // Fetch countries from the backend API
@@ -114,7 +116,7 @@ export default function FlightRule({ conditions, onFormDataChange }: FlightRuleP
     onFormDataChange({
       ...conditions,
       [name]: value
-    }, );
+    }, true);
     // true
   };
   // Handle changes in origin country select field
@@ -123,12 +125,14 @@ export default function FlightRule({ conditions, onFormDataChange }: FlightRuleP
   countryKey: 'originCountries' | 'destinationCountries',
   cityKey: 'originCities' | 'destinationCities'
 ) => {
-  const selectedCountries = selectedOptions ? selectedOptions.map((option: any) => option.iso2) : [];
+  // const selectedCountries = selectedOptions ? selectedOptions.map((option: any) => option.iso2) : [];
+  const selectedCountries = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
+  
   onFormDataChange({
     ...conditions,
     [countryKey]: selectedCountries,
     [cityKey]: []  
-  }, );
+  },true );
   // true
 };
 
@@ -140,8 +144,8 @@ const handleCityChange = (
   onFormDataChange({
     ...conditions,
     [cityKey]: selectedCities
-  }, );
-  // true
+  }, true);
+  // 
 };
 
 
@@ -157,7 +161,8 @@ const handleCityChange = (
     ? cities.map((city: any) => ({
       value: city.name,
       id: city.id,
-      label: city.name
+      label: city.name,
+      code:(city.iata) ? city.iata: city.icao
     })) : [];
   return (
     <div className="flight-rule-div mt-4">
@@ -228,12 +233,12 @@ const handleCityChange = (
               <ReactDatePicker
                 selected={conditions.fromDate ? new Date(conditions.fromDate) : null}
                 onChange={(date: Date | null) => {
-                  // if (date) {
-                  //   onFormDataChange({
-                  //     ...conditions,
-                  //     fromDate: date.toISOString().split('T')[0],
-                  //   }, true);
-                  // }
+                  if (date) {
+                    onFormDataChange({
+                      ...conditions,
+                      fromDate: date.toISOString().split('T')[0],
+                    }, true);
+                  }
                 }}
                 minDate={new Date()}
                 dateFormat="dd-MM-yyyy"
@@ -245,12 +250,12 @@ const handleCityChange = (
               <ReactDatePicker
                 selected={conditions.toDate ? new Date(conditions.toDate) : null}
                 onChange={(date: Date | null) => {
-                  // if (date) {
-                  //   onFormDataChange({
-                  //     ...conditions,
-                  //     toDate: date.toISOString().split('T')[0],
-                  //   }, true);
-                  // }
+                  if (date) {
+                    onFormDataChange({
+                      ...conditions,
+                      toDate: date.toISOString().split('T')[0],
+                    }, true);
+                  }
                 }}
                 minDate={conditions.fromDate ? new Date(conditions.fromDate) : new Date()}
                 dateFormat="dd-MM-yyyy"
@@ -264,7 +269,7 @@ const handleCityChange = (
             <Select
                 name="originCountries"
                 value={countryOptions.filter((option) =>
-                  (conditions.originCountries || []).includes(option.iso2)
+                  (conditions.originCountries || []).includes(option.value)
                 )}
                 onChange={(selectedOptions) =>
                   handleCountryChange(selectedOptions, 'originCountries', 'originCities')
@@ -294,7 +299,7 @@ const handleCityChange = (
               <Select
                 name="destinationCountries"
                 value={countryOptions.filter((option) =>
-                  (conditions.destinationCountries || []).includes(option.iso2)
+                  (conditions.destinationCountries || []).includes(option.value)
                 )}
                 onChange={(selectedOptions) =>
                   handleCountryChange(selectedOptions, 'destinationCountries', 'destinationCities')
