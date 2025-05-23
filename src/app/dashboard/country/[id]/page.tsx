@@ -121,7 +121,7 @@ export default function CountryForm() {
       if (countryId) formData.append('country_id', countryId.toString())
       if (image) formData.append('image', image)
       if(editimage) formData.append('existingImage',editimage);
-      if(isShow) formData.append('showInFrontend',isShow);
+      formData.append('showInFrontend', isShow ? 'true' : 'false');
       if(id) formData.append('id',id.toString());
       try {
         const token = localStorage.getItem('authToken')
