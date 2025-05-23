@@ -90,18 +90,24 @@ export default function Sidebar() {
         { label: 'All Enquires', href: '/dashboard/enquiries' },
       ]
     },
+    // { 
+    //   icon: <FiSettings size={18} />, 
+    //   label: 'CRM', 
+    //   href: '/dashboard/crm',
+    //   subItems: null
+    // },
     { 
       icon: <FiPlusCircle size={18} />, 
       label: 'Add Image to Country', 
       href: '/dashboard/country',
       subItems: null
     },
-    { 
-      icon: <FiSettings size={18} />, 
-      label: 'Rules', 
-      href: '/dashboard/rules',
-      subItems: null
-    },
+    // { 
+    //   icon: <FiSettings size={18} />, 
+    //   label: 'Rules', 
+    //   href: '/dashboard/rules',
+    //   subItems: null
+    // },
   ]
 
   if (!isMounted) return null

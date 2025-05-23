@@ -2,25 +2,30 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useRouter, useParams } from 'next/navigation'
+import { toast } from 'react-toastify';
 
 let debounceTimeout: ReturnType<typeof setTimeout>;
 
 export default function CountryForm() {
   const router = useRouter();
-  const { id } = useParams() // Use `useParams` to get the `id` from the URL if available.
-  
+  let { id } = useParams() // Use `useParams` to get the `id` from the URL if available.
+    if(id =='new'){
+      id = '';
+    }
   const [name, setName] = useState('')
   const [countryId, setCountryId] = useState<string | number | null>(null)
   const [image, setImage] = useState<File | null>(null)
+  const [editimage, setEditImage] = useState<string | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [filteredCountries, setFilteredCountries] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [isShow,setisShow] =useState(false);
 
   const [errors, setErrors] = useState<{ name?: string; image?: string }>({})
-
+// 
   // Fetch country data when editing
   useEffect(() => {
-    if (id) {
+    if (id && id!="new") {
       setLoading(true)
       const token = localStorage.getItem('authToken')
       axios
@@ -31,7 +36,9 @@ export default function CountryForm() {
           const country = response.data.data;
           setCountryId(country._id);
           setName(country.country_name);
-          setImagePreview(country.image); // Assuming the image URL is stored here
+          setImagePreview(country.image); 
+          setisShow(country.showInFrontend)
+          setEditImage(country.image)// Assuming the image URL is stored here
         })
         .catch((error) => {
           console.error('Error fetching country data:', error);
@@ -39,6 +46,8 @@ export default function CountryForm() {
         .finally(() => {
           setLoading(false);
         });
+    }else{
+
     }
   }, [id]);
 
@@ -108,27 +117,30 @@ export default function CountryForm() {
     if (!validate()) return
 
     const formData = new FormData()
-    formData.append('name', name)
-    if (countryId) formData.append('country_id', countryId.toString())
-    if (image) formData.append('image', image)
-    if(id) formData.append('id',id.toString());
-    try {
-      const token = localStorage.getItem('authToken')
-      const endpoint = id
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/add-country-image`
-        : `${process.env.NEXT_PUBLIC_BACKEND_URL}/add-country-image`
-      
-      const response = await axios.post(endpoint, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      formData.append('name', name)
+      if (countryId) formData.append('country_id', countryId.toString())
+      if (image) formData.append('image', image)
+      if(editimage) formData.append('existingImage',editimage);
+      if(isShow) formData.append('showInFrontend',isShow);
+      if(id) formData.append('id',id.toString());
+      try {
+        const token = localStorage.getItem('authToken')
+        const endpoint = id
+          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/add-country-image`
+          : `${process.env.NEXT_PUBLIC_BACKEND_URL}/add-country-image`
+        
+        const response = await axios.post(endpoint, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        toast.success(response.data.message)
 
-      router.push(`/dashboard/country`)
-    } catch (error) {
-      console.error('Error saving country:', error)
-    }
+        router.push(`/dashboard/country`)
+      } catch (error) {
+        console.error('Error saving country:', error)
+      }
   }
 
   return (
@@ -185,7 +197,25 @@ export default function CountryForm() {
             </div>
           )}
         </div>
-
+        <div className="mb-3">
+            <div className="form-check form-switch">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id="showInFrontend"
+                            checked={isShow === true}
+                            onChange={(e) =>
+                              setisShow(
+                                e.target.checked ? true : false
+                              )
+                            }
+                          />
+                          <label className="form-check-label" htmlFor={`showInFrontend`}>
+                            Display In Frontend
+                          </label>
+                        </div> 
+        </div>
         <button className="btn btn-success" type="submit">
           {id ? 'Update Country' : 'Save Country'}
         </button>
