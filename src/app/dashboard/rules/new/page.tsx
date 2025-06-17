@@ -92,9 +92,9 @@ export default function AddMarkupRule() {
   const renderRuleComponent = () => {
     switch (formData.productType) {
       case '1':
-        // return <FlightRule conditions={formData.conditions} onFormDataChange={handleChange}  />
+        return <FlightRule conditions={formData.conditions} onFormDataChange={handleChange}  />
       case '2':
-        // return <HotelRule  conditions={formData.conditions} onFormDataChange={handleChange} />
+        return <HotelRule  conditions={formData.conditions} onFormDataChange={handleChange} />
       case '3':
         // return <CarRule  conditions={formData.conditions} onFormDataChange={handleChange} />
       default:

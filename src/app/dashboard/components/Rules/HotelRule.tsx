@@ -113,10 +113,10 @@ export default function HotelRule({ conditions, onFormDataChange }: FlightRulePr
   // Handle changes in flight inputs (select fields)
   const handleFlightChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    // onFormDataChange({
-    //   ...conditions,
-    //   [name]: value
-    // }, true);
+    onFormDataChange({
+      ...conditions,
+      [name]: value
+    }, true);
     // true
   };
   // Handle changes in origin country select field
@@ -128,11 +128,11 @@ export default function HotelRule({ conditions, onFormDataChange }: FlightRulePr
   // const selectedCountries = selectedOptions ? selectedOptions.map((option: any) => option.iso2) : [];
   const selectedCountries = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
   
-  // onFormDataChange({
-  //   ...conditions,
-  //   [countryKey]: selectedCountries,
-  //   [cityKey]: []  
-  // },true );
+  onFormDataChange({
+    ...conditions,
+    [countryKey]: selectedCountries,
+    [cityKey]: []  
+  },true );
   // true
 };
 
@@ -141,10 +141,10 @@ const handleCityChange = (
   cityKey: 'originCities' | 'destinationCities'
 ) => {
   const selectedCities = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
-  // onFormDataChange({
-  //   ...conditions,
-  //   [cityKey]: selectedCities
-  // }, true);
+  onFormDataChange({
+    ...conditions,
+    [cityKey]: selectedCities
+  }, true);
   // 
 };
 
@@ -234,10 +234,10 @@ const handleCityChange = (
                 selected={conditions.fromDate ? new Date(conditions.fromDate) : null}
                 onChange={(date: Date | null) => {
                   if (date) {
-                    // onFormDataChange({
-                    //   ...conditions,
-                    //   fromDate: date.toISOString().split('T')[0],
-                    // }, true);
+                    onFormDataChange({
+                      ...conditions,
+                      fromDate: date.toISOString().split('T')[0],
+                    }, true);
                   }
                 }}
                 minDate={new Date()}
@@ -251,10 +251,10 @@ const handleCityChange = (
                 selected={conditions.toDate ? new Date(conditions.toDate) : null}
                 onChange={(date: Date | null) => {
                   if (date) {
-                    // onFormDataChange({
-                    //   ...conditions,
-                    //   toDate: date.toISOString().split('T')[0],
-                    // }, true);
+                    onFormDataChange({
+                      ...conditions,
+                      toDate: date.toISOString().split('T')[0],
+                    }, true);
                   }
                 }}
                 minDate={conditions.fromDate ? new Date(conditions.fromDate) : new Date()}

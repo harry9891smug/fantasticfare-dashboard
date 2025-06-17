@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import axios from 'axios'
+import Select from 'react-select';
 
 type Addon = {
   _id: string
@@ -28,9 +29,17 @@ type FormData = {
   region: string
   country: string
   _id?: string
+  tags:string[]
 }
 
 export default function EditPackage() {
+  const tagsoptions = [
+    'adventure','family','yatra','group','solo','luxury','honeymoon'
+  ]
+ const tagOptionsFormatted = tagsoptions.map(tag => ({
+    value: tag,
+    label: tag.charAt(0).toUpperCase() + tag.slice(1)
+  }));
   const router = useRouter()
   const { id } = useParams()
 
@@ -47,7 +56,8 @@ export default function EditPackage() {
     addon_ids: [],
     continent: '',
     region: '',
-    country: ''
+    country: '',
+    tags:[]
   })
 
   const [availableAddons, setAvailableAddons] = useState<Addon[]>([])
@@ -77,6 +87,7 @@ export default function EditPackage() {
         continent: packageData.continent,
         region: packageData.region,
         country: packageData.country,
+        tags:packageData.package_tags ?? [],
       })
 
       if (packageData.package_image?.length) {
@@ -421,6 +432,22 @@ export default function EditPackage() {
                   ))}
                 </div>
               </div>
+              <div className="col-sm-12">
+                <label className="form-label-title mt-3">Package Tags</label>
+                 <Select
+                  isMulti
+                  name="tags"
+                  options={tagOptionsFormatted}
+                  value={formData.tags.map(tag => ({ value: tag, label: tag }))}
+                  onChange={(selected) => {
+                      const selectedTags = selected ? selected.map(option => option.value) : [];
+                      setFormData(prev => ({ ...prev, tags: selectedTags }));
+                  }}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  placeholder="select tags "
+                />
+                </div>
 
               <div className="col-12 mt-4">
                 <label className="form-label-title">Available Addons</label>

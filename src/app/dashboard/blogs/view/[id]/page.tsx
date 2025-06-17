@@ -14,7 +14,8 @@ export default function AddOrEditArticle() {
     article_heading: '',
     article_description: '',
     article_images: [] as string[], // Changed to string[] since your API returns URLs
-    faqs: [{ question: '', answer: '' }]
+    faqs: [{ question: '', answer: '' }],
+    article_slug:''
   })
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -49,7 +50,8 @@ export default function AddOrEditArticle() {
           article_images: images,
           faqs: Array.isArray(data.faqs) && data.faqs.length
             ? data.faqs
-            : [{ question: '', answer: '' }]
+            : [{ question: '', answer: '' }],
+            article_slug:data.article_slug
         })
       } catch (err: any) {
         alert(err.response?.data?.message || 'Failed to load article')
@@ -112,6 +114,7 @@ export default function AddOrEditArticle() {
 
     formData.append('article_heading', articleData.article_heading)
     formData.append('article_description', articleData.article_description)
+    formData.append('article_slug', articleData.article_slug)
 
     // Append existing images
     articleData.article_images.forEach((img, index) => {
@@ -169,7 +172,8 @@ export default function AddOrEditArticle() {
             </div>
             <div className="card-body">
               <form className="theme-form mega-form" onSubmit={handleSubmit}>
-                <div className="mb-3">
+               <div className="col-md-12 row">
+                <div className="mb-3 col-md-6">
                   <label className="form-label-title">Article Heading</label>
                   <input
                     className="form-control"
@@ -179,6 +183,18 @@ export default function AddOrEditArticle() {
                     onChange={handleChange}
                     required
                   />
+                </div>
+                 <div className="mb-3 col-md-6">
+                  <label className="form-label-title">Article URL (<span className='text-danger'>spacing not allowed</span>)</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="article_slug"
+                    value={articleData.article_slug}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
                 </div>
 
                 <div className="mb-3">
