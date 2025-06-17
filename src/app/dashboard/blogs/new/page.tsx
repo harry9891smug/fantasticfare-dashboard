@@ -12,7 +12,8 @@ export default function AddArticle() {
     article_heading: '',
     article_description: '',
     article_images: [] as File[],
-    questions: [{ question: '', answer: '' }]
+    questions: [{ question: '', answer: '' }],
+    article_slug: '',
   })
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -85,6 +86,7 @@ export default function AddArticle() {
       const formData = new FormData()
       formData.append('article_heading', articleData.article_heading)
       formData.append('article_description', articleData.article_description)
+      formData.append('article_slug', articleData.article_slug)
 
       // Append all images
       articleData.article_images.forEach((image, index) => {
@@ -103,7 +105,7 @@ export default function AddArticle() {
           'Content-Type': 'multipart/form-data'
         }
       })
-      
+
       alert('Article created successfully!')
       router.push('/dashboard/blogs')
     } catch (error: any) {
@@ -122,16 +124,29 @@ export default function AddArticle() {
             <div className="card-header"><h5>Add New Article</h5></div>
             <div className="card-body">
               <form className="theme-form mega-form" onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label className="form-label-title">Article Heading</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="article_heading"
-                    value={articleData.article_heading}
-                    onChange={handleChange}
-                    required
-                  />
+                <div className="col-md-12 row">
+                  <div className="mb-3 col-md-6">
+                    <label className="form-label-title">Article Heading</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="article_heading"
+                      value={articleData.article_heading}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3 col-md-6">
+                    <label className="form-label-title">Article URL (<span className='text-danger'>spacing not allowed</span>)</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="article_slug"
+                      value={articleData.article_slug}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="mb-3">
@@ -179,7 +194,7 @@ export default function AddArticle() {
                   <Editor
                     apiKey="8brh26vfpwcwn8uphb1cilw3anjhw5ly5ghwc5js1gsl2vjh"
                     value={articleData.article_description}
-                    onEditorChange={(newContent:any) => 
+                    onEditorChange={(newContent: any) =>
                       setArticleData(prev => ({ ...prev, article_description: newContent }))
                     }
                     init={{
@@ -191,27 +206,27 @@ export default function AddArticle() {
                         'insertdatetime media table paste code help wordcount'
                       ],
                       toolbar: 'undo redo | formatselect | ' +
-                      'bold italic backcolor | alignleft aligncenter ' +
-                      'alignright alignjustify | bullist numlist outdent indent | ' +
-                      'removeformat | help',
+                        'bold italic backcolor | alignleft aligncenter ' +
+                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                        'removeformat | help',
                       content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                      images_upload_handler: async (blobInfo:any, progress:any) => {
+                      images_upload_handler: async (blobInfo: any, progress: any) => {
                         return new Promise((resolve, reject) => {
                           const formData = new FormData()
                           formData.append('file', blobInfo.blob(), blobInfo.filename())
-                          
+
                           axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload-image`, formData, {
                             headers: {
                               'Content-Type': 'multipart/form-data'
                             }
                           })
-                          .then(response => {
-                            resolve(response.data.location)
-                          })
-                          .catch(error => {
-                            reject('Image upload failed')
-                            console.error(error)
-                          })
+                            .then(response => {
+                              resolve(response.data.location)
+                            })
+                            .catch(error => {
+                              reject('Image upload failed')
+                              console.error(error)
+                            })
                         })
                       }
                     }}
@@ -239,9 +254,9 @@ export default function AddArticle() {
                         required
                       />
                       {index > 0 && (
-                        <button 
-                          type="button" 
-                          className="btn btn-danger btn-sm mt-2" 
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm mt-2"
                           onClick={() => removeQAField(index)}
                         >
                           Remove
@@ -249,9 +264,9 @@ export default function AddArticle() {
                       )}
                     </div>
                   ))}
-                  <button 
-                    type="button" 
-                    className="btn btn-outline-primary mt-2" 
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary mt-2"
                     onClick={addQAField}
                   >
                     Add More
@@ -259,16 +274,16 @@ export default function AddArticle() {
                 </div>
 
                 <div className="card-footer text-end">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-primary me-3"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit'}
                   </button>
-                  <button 
-                    type="button" 
-                    className="btn btn-outline-primary" 
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary"
                     onClick={() => router.push('/dashboard/blogs')}
                   >
                     Cancel
