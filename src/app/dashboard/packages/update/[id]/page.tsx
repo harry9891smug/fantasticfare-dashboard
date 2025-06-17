@@ -30,6 +30,7 @@ type FormData = {
   country: string
   _id?: string
   tags:string[]
+  package_tags:string[]
 }
 
 export default function EditPackage() {
@@ -57,7 +58,8 @@ export default function EditPackage() {
     continent: '',
     region: '',
     country: '',
-    tags:[]
+    tags:[],
+    package_tags:[]
   })
 
   const [availableAddons, setAvailableAddons] = useState<Addon[]>([])
