@@ -1,29 +1,30 @@
 'use client'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { FiEye } from 'react-icons/fi'
+import { FiEdit, FiEdit3, FiEye, FiTrash } from 'react-icons/fi'
 import Link from 'next/link'
+import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
-interface Enquiry {
+interface Pages {
   _id: string
-  first_name: string
-  last_name: string
-  email?: string
-  mobile_number: string
-  country_code?: string
-  enquiry_from?: string
+  page_name: string
+  page_url: string
+  page_priority: string
+  page_status?: string
   createdAt?: string
 }
 
 export default function AllPages() {
-  const [enquiries, setEnquiries] = useState<Enquiry[]>([])
+  const router = useRouter()
+  const [pages, setPages] = useState<Pages[]>([])
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
   const limit = 10
 
   useEffect(() => {
-    const fetchEnquiries = async () => {
+    const fetchPages = async () => {
       const token = localStorage.getItem('authToken')
       if (!token) {
         setError('Unauthorized: No token found. Please log in.')
@@ -32,22 +33,22 @@ export default function AllPages() {
 
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/list-enquiries?page=${currentPage}&limit=${limit}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/crm/list-pages?page=${currentPage}&limit=${limit}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         )
-        setEnquiries(response.data.data || [])
-        setTotalPages(response.data.pagination.totalPages || 1)
+        setPages(response.data.data || [])
+        setTotalPages(response.data.totalPages || 1)
       } catch (error: any) {
-        setError(error.response?.data?.message || 'Failed to fetch enquiries')
-        setEnquiries([])
+        setError(error.response?.data?.message || 'Failed to fetch pages')
+        setPages([])
       }
     }
 
-    fetchEnquiries()
+    fetchPages()
   }, [currentPage])
 
   const handlePageChange = (page: number) => {
@@ -55,7 +56,30 @@ export default function AllPages() {
       setCurrentPage(page)
     }
   }
+  const formatDate = (datedata: string | number | Date): string => {
+   return  new Date(datedata).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit'
+});
+}
+const handleDelete = async (id: string) => {
+  const token = localStorage.getItem('authToken')
 
+  try {
+    const res = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/crm/delete-page/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    toast.success('Page deleted successfully!')
+   router.push('/dashboard/crm')
+  } catch (error) {
+    console.error('Delete failed:', error)
+    toast.error('Failed to delete the page.')
+  }
+}
   return (
     <div className="container-fluid">
       <div className="row">
@@ -65,6 +89,9 @@ export default function AllPages() {
               <h5>All Enquiries</h5>
             </div>
 
+              <div className="link">
+                <Link href='/dashboard/crm/new' className='btn btn-primary' style={{float:'right',marginRight:'40px',marginTop:'10px'}}>Add Page</Link>
+              </div>
             <div className="card-body">
               {error && <div className="alert alert-danger">{error}</div>}
               <div className="table-responsive">
@@ -72,28 +99,43 @@ export default function AllPages() {
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Name</th>
-                      <th>Enquiry From</th>
+                      <th>Page Name</th>
+                      <th>Page Priority</th>
+                      <th>Page Status</th>
+                      <th>Created On</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {enquiries.length > 0 ? (
-                      enquiries.map((enquiry, index) => (
-                        <tr key={enquiry._id}>
+                    {pages.length > 0 ? (
+                      pages.map((page, index) => (
+                        <tr key={page._id}>
                           <td>{(currentPage - 1) * limit + index + 1}</td>
-                          <td>{enquiry.first_name} {enquiry.last_name}</td>
-                          <td>{enquiry.enquiry_from}</td>
+                          <td>{page.page_name}</td>
+                          <td>{page.page_priority}</td>
+                          <td style={{
+                              color: page.page_status === 'active' ? 'green' : 'red',
+                              fontWeight: 'bold'
+                            }}
+                            >{page.page_status === 'active' ? 'Active' : 'Inactive'}</td>
+                          <td>{page.createdAt ? formatDate(page.createdAt) : 'N/A'}</td>
                           <td>
-                            <Link href={`/dashboard/enquiries/view/${enquiry._id}`}>
-                              <FiEye className="text-primary" />
-                            </Link>
+                             <Link href={`/dashboard/crm/edit/${page._id}`}>
+                              <FiEdit className="text-info" />
+                            </Link>&nbsp;&nbsp;&nbsp;
+                          <button  onClick={() => {
+                              if (window.confirm('Are you sure you want to delete this page?')) {
+                                handleDelete(page._id)
+                              }
+                            }} className="btn p-0" title="Delete">
+                            <FiTrash className="text-danger" />
+                          </button>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="text-center">No Enquiries found.</td>
+                        <td colSpan={4} className="text-center">No Pages found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -102,7 +144,7 @@ export default function AllPages() {
             </div>
 
             {/* Pagination */}
-            {/* {totalPages > 1 && (
+            {totalPages > 1 && (
               <div className="card-footer d-flex justify-content-center">
                 <nav aria-label="Page navigation">
                   <ul className="pagination pagination-primary">
@@ -120,7 +162,7 @@ export default function AllPages() {
                   </ul>
                 </nav>
               </div>
-            )} */}
+            )}
           </div>
         </div>
       </div>
