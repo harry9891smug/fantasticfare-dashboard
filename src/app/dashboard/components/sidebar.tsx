@@ -6,7 +6,8 @@ import {
   FiNavigation, FiBookmark, FiMessageSquare, 
   FiSettings, FiLogIn, FiPlusCircle,
   FiGrid, FiArrowLeft, FiArrowRight, FiChevronLeft, FiChevronRight,
-  FiEye, FiEdit, FiTrash2
+  FiEye, FiEdit, FiTrash2,
+  FiLayers
 } from 'react-icons/fi'
 import Image from 'next/image'
 import SimpleBar from 'simplebar-react'
@@ -82,6 +83,7 @@ export default function Sidebar() {
         { label: 'All Articles', href: '/dashboard/blogs' },
       ]
     },
+    
     { 
       icon: <FiSettings size={18} />, 
       label: 'Enquiries',
@@ -90,12 +92,12 @@ export default function Sidebar() {
         { label: 'All Enquires', href: '/dashboard/enquiries' },
       ]
     },
-    // { 
-    //   icon: <FiSettings size={18} />, 
-    //   label: 'CRM', 
-    //   href: '/dashboard/crm',
-    //   subItems: null
-    // },
+    { 
+      icon: <FiLayers size={18} />, 
+      label: 'CRM', 
+      href: '/dashboard/crm',
+      subItems: null
+    },
     { 
       icon: <FiPlusCircle size={18} />, 
       label: 'Add Image to Country', 
